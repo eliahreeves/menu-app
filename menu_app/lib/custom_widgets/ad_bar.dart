@@ -23,7 +23,7 @@ class _AdBar extends StatelessWidget {
     var viewModel = Provider.of<AdBarController>(context, listen: true);
     if (viewModel.showAd) {
       return Container(
-        color: Theme.of(context).colorScheme.surface,
+        color: const Color(0xff0f0f0f),
         alignment: Alignment.topCenter,
         height: viewModel.adHeight,
         child: viewModel.showAd
