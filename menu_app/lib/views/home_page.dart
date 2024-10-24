@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
       create: (context) => HomePageController(context: context),
       builder: (context, child) {
         // Needs to be built before showing the update dialog
-        double iconSizeCollege = MediaQuery.of(context).size.width / 2.7;
+        double iconSizeCollege = MediaQuery.of(context).size.width / 2.5;
 
         return Scaffold(
           // Display app bar header.
@@ -196,9 +196,7 @@ class _HallIcon extends StatelessWidget {
             ),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
-          child: Image.asset(icon)),
-      //  Image.asset(
-      //     'images/${controller.colleges[index].trim()}.png'),
+          child:Center(child: SizedBox(width: size, height: size, child: Image.asset(icon)))),
       iconSize: size,
     );
   }

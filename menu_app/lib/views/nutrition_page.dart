@@ -10,6 +10,7 @@ class NutritionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
         title: Text(
           'Nutrition',
           style: TextStyle(
@@ -31,7 +32,7 @@ class NutritionPage extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: NutritionLabel(foodItem: foodItem),
     );
   }
@@ -176,17 +177,12 @@ class NutritionLabel extends StatelessWidget {
                     const Spacer(),
                     for (String allergy in foodItem.nutritionalInfo.tags)
                       // TODO FIXME when eric fixes scraper
-                      if (allergy != "" &&
-                          allergy != "Gluten Friendly" &&
-                          allergy != "Tree Nut" &&
-                          allergy != "Peanuts" &&
-                          allergy != "Vegetarian" &&
-                          allergy != "Egg")
+                      if (allergy != "")
                         Padding(
                           padding: EdgeInsets.only(left: 2),
                           child: ClipOval(
                             child: Image.asset(
-                              'icons/${allergy.toLowerCase()}.gif',
+                              'icons/${allergy.toLowerCase()}',
                               isAntiAlias: true,
                               fit: BoxFit.contain,
                               scale: 1.25,
