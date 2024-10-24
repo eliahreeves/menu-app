@@ -239,7 +239,7 @@ func scrape() error {
 										// Check if the current category is in the exclusion list
 										excluded := false
 										for _, cat := range excludeCategories {
-											if currentCategory == cat {
+											if strings.EqualFold(currentCategory, cat) {
 												excluded = true
 												break
 											}

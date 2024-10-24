@@ -387,7 +387,7 @@ func processCategory(categoryText string) string {
 
 func isExcludedCategory(category string) bool {
 	for _, excludedCat := range excludeCategories {
-		if category == excludedCat {
+		if strings.EqualFold(category, excludedCat) {
 			return true
 		}
 	}
