@@ -20,11 +20,11 @@ import (
 var url = "https://nutrition.sa.ucsc.edu/"
 
 var diningHallNames = map[string]string{
-	"John R. Lewis & College Nine Dining Hall": "Nine",
-	"Cowell & Stevenson Dining Hall":           "Cowell",
-	"Crown & Merrill Dining Hall":              "Merrill",
-	"Porter & Kresge Dining Hall":              "Porter",
-	"Rachel Carson & Oakes Dining Hall":        "Oakes",
+	"John R. Lewis & College Nine Dining Hall":     "Nine",
+	"Cowell & Stevenson Dining Hall":               "Cowell",
+	"Crown & Merrill Dining Hall and Banana Joe's": "Merrill",
+	"Porter & Kresge Dining Hall":                  "Porter",
+	"Rachel Carson & Oakes Dining Hall":            "Oakes",
 }
 
 var excludeCategories = []string{
