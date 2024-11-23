@@ -3,9 +3,11 @@ package scraper_v2
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 	"sync"
@@ -80,61 +82,69 @@ type PubSubMessage struct {
 var menu = make(map[string]interface{})
 
 // main function
-// func main() {
-// 	config := &firebase.Config{
-// 		DatabaseURL: "https://ucsc-menu-app-default-rtdb.firebaseio.com/",
-// 	}
-// 	app, err := firebase.NewApp(context.Background(), config)
-// 	if err != nil {
-// 		fmt.Printf("error initializing app: %v", err)
-// 	}
-// 	db, err := app.Database(context.Background())
-// 	if err != nil {
-// 		fmt.Printf("error initializing database client: %v", err)
-// 	}
+func main() {
+	config := &firebase.Config{
+		DatabaseURL: "https://ucsc-menu-app-default-rtdb.firebaseio.com/",
+	}
+	app, err := firebase.NewApp(context.Background(), config)
+	if err != nil {
+		fmt.Printf("error initializing app: %v", err)
+	}
+	db, err := app.Database(context.Background())
+	if err != nil {
+		fmt.Printf("error initializing database client: %v", err)
+	}
 
-// 	menu = make(map[string]interface{}) // clear menu map
+	menu = make(map[string]interface{}) // clear menu map
 
-// 	start := time.Now()
-// 	err = scrape()
-// 	if err != nil {
-// 		fmt.Printf("error in scrape function: %v\n", err)
-// 	}
-// 	duration := time.Since(start)
-// 	fmt.Printf("Scraping completed in %v\n", duration)
+	start := time.Now()
 
-// 	err = reorderCategories()
-// 	if err != nil {
-// 		fmt.Printf("error in reorderCategories function: %v", err)
-// 	}
+	err = scrape()
+	if err != nil {
+		UpdateBannerError(db, true)
+		fmt.Printf("error in scrape function: %v\n", err)
+		return
+	}
+	duration := time.Since(start)
+	fmt.Printf("Scraping completed in %v\n", duration)
 
-// 	err = makeSummary()
-// 	if err != nil {
-// 		fmt.Printf("error in makeSummary function: %v", err)
-// 	}
+	err = reorderCategories()
+	if err != nil {
+		UpdateBannerError(db, true)
+		fmt.Printf("error in reorderCategories function: %v", err)
+		return
+	}
 
-// 	// // Create a file
-// 	// file, err := os.Create("menu.json")
-// 	// if err != nil {
-// 	// 	fmt.Printf("error creating file: %v", err)
-// 	// }
-// 	// defer file.Close()
+	err = makeSummary()
+	if err != nil {
+		UpdateBannerError(db, true)
+		fmt.Printf("error in makeSummary function: %v", err)
+		return
+	}
 
-// 	// // Write the menu to the file in a readable format
-// 	// menuJson, err := json.MarshalIndent(menu, "", "  ")
-// 	// if err != nil {
-// 	// 	fmt.Printf("error marshalling menu: %v", err)
-// 	// }
-// 	// _, err = file.Write(menuJson)
-// 	// if err != nil {
-// 	// 	fmt.Printf("error writing to file: %v", err)
-// 	// }
+	// Create a file
+	file, err := os.Create("menu.json")
+	if err != nil {
+		fmt.Printf("error creating file: %v", err)
+	}
+	defer file.Close()
 
-// 	err = UpdateDatabase(db, menu)
-// 	if err != nil {
-// 		fmt.Printf("error updating database: %v", err)
-// 	}
-// }
+	// Write the menu to the file in a readable format
+	menuJson, err := json.MarshalIndent(menu, "", "  ")
+	if err != nil {
+		fmt.Printf("error marshalling menu: %v", err)
+	}
+	_, err = file.Write(menuJson)
+	if err != nil {
+		fmt.Printf("error writing to file: %v", err)
+	}
+
+	err = UpdateDatabase(db, menu)
+	if err != nil {
+		UpdateBannerError(db, true)
+		fmt.Printf("error updating database: %v", err)
+	}
+}
 
 // google cloud function
 func ScraperRun(ctx context.Context, m PubSubMessage) error {
@@ -164,16 +174,19 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
+		UpdateBannerError(db, true)
 		return fmt.Errorf("error in scrape function: %v", err)
 	}
 
 	err = reorderCategories()
 	if err != nil {
+		UpdateBannerError(db, true)
 		return fmt.Errorf("error in reorderCategories function: %v", err)
 	}
 
 	err = makeSummary()
 	if err != nil {
+		UpdateBannerError(db, true)
 		return fmt.Errorf("error in makeSummary function: %v", err)
 	}
 
@@ -185,6 +198,7 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
+		UpdateBannerError(db, true)
 		return fmt.Errorf("error updating database: %v", err)
 	}
 
@@ -339,10 +353,12 @@ func processFoodItem(e *colly.Collector, foodName, foodLink, day, diningHall, me
 		mu.Unlock()
 	})
 
-	err := e.Visit(foodLink)
-	if err != nil {
-		fmt.Printf("Error processing food item %s: %v\n", foodName, err)
-	}
+	go func() {
+		if err := e.Visit(foodLink); err != nil {
+			fmt.Printf("Error processing food item %s: %v\n", foodName, err)
+		}
+	}()
+
 	e.Wait()
 }
 
@@ -578,28 +594,70 @@ func makeSummary() error {
 	return nil
 }
 
-// Database functions
-func DeleteReference(client *db.Client, ref_str string) error {
-	ref := client.NewRef(ref_str)
-	if err := ref.Delete(context.Background()); err != nil {
-		return err
+// Database function
+func UpdateDatabase(client *db.Client, hall_menus map[string]interface{}) error {
+	ref := client.NewRef("/menuv2/")
+
+	// Save the current state of the database
+	var currentData map[string]interface{}
+	if err := ref.Get(context.Background(), &currentData); err != nil {
+		return fmt.Errorf("failed to get current data: %w", err)
 	}
+
+	// Attempt to update the database with the new data
+	if err := ref.Set(context.Background(), hall_menus); err != nil {
+		// If the update fails, restore the old data
+		if restoreErr := ref.Set(context.Background(), currentData); restoreErr != nil {
+			return fmt.Errorf("failed to restore old data after update failure: %w", restoreErr)
+		}
+		return fmt.Errorf("failed to update database: %w", err)
+	}
+
+	// write current datetime to /lastScraped
+	location, _ := time.LoadLocation("America/Los_Angeles")
+	lastScrapedTime := time.Now().In(location).Format("3:04 pm, 01/02")
+
+	lastScrapedRef := client.NewRef("/lastScraped")
+	if err := lastScrapedRef.Set(context.Background(), lastScrapedTime); err != nil {
+		return fmt.Errorf("failed to update lastScraped: %w", err)
+	}
+
+	// Clear the banner
+	UpdateBannerError(client, false)
+
 	return nil
 }
 
-func UpdateDatabase(client *db.Client, hall_menus map[string]interface{}) error {
-	references := []string{"/menuv2/"}
-	for _, ref := range references {
-		err := DeleteReference(client, ref)
-		if err != nil {
-			return err
+func UpdateBannerError(client *db.Client, error bool) error {
+	if error {
+		// Get the error message from /bannerError
+		bannerErrorRef := client.NewRef("/bannerError")
+		var bannerError string
+		if err := bannerErrorRef.Get(context.Background(), &bannerError); err != nil {
+			return fmt.Errorf("failed to get bannerError: %w", err)
 		}
-	}
 
-	ref := client.NewRef("/menuv2/")
-	err := ref.Update(context.Background(), hall_menus)
-	if err != nil {
-		return err
+		// Get the last scraped time from /lastScraped
+		lastScrapedRef := client.NewRef("/lastScraped")
+		var lastScraped string
+		if err := lastScrapedRef.Get(context.Background(), &lastScraped); err != nil {
+			return fmt.Errorf("failed to get lastScraped: %w", err)
+		}
+
+		// Create the banner message
+		bannerMessage := fmt.Sprintf("%s%s", bannerError, lastScraped)
+
+		// Update the /Banner reference with the new message
+		bannerRef := client.NewRef("/Banner")
+		if err := bannerRef.Set(context.Background(), bannerMessage); err != nil {
+			return fmt.Errorf("failed to update Banner: %w", err)
+		}
+	} else {
+		// Clear the /Banner
+		bannerRef := client.NewRef("/Banner")
+		if err := bannerRef.Set(context.Background(), ""); err != nil {
+			return fmt.Errorf("failed to update Banner: %w", err)
+		}
 	}
 
 	return nil
