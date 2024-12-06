@@ -20,11 +20,11 @@ import (
 var url = "https://nutrition.sa.ucsc.edu/"
 
 var diningHallNames = map[string]string{
-	"John R. Lewis & College Nine Dining Hall": "Nine",
-	"Cowell & Stevenson Dining Hall":           "Cowell",
-	"Crown & Merrill Dining Hall":              "Merrill",
-	"Porter & Kresge Dining Hall":              "Porter",
-	"Rachel Carson & Oakes Dining Hall":        "Oakes",
+	"John R. Lewis & College Nine Dining Hall":     "Nine",
+	"Cowell & Stevenson Dining Hall":               "Cowell",
+	"Crown & Merrill Dining Hall and Banana Joe's": "Merrill",
+	"Porter & Kresge Dining Hall":                  "Porter",
+	"Rachel Carson & Oakes Dining Hall":            "Oakes",
 }
 
 var excludeCategories = []string{
@@ -239,7 +239,7 @@ func scrape() error {
 										// Check if the current category is in the exclusion list
 										excluded := false
 										for _, cat := range excludeCategories {
-											if currentCategory == cat {
+											if strings.EqualFold(currentCategory, cat) {
 												excluded = true
 												break
 											}
