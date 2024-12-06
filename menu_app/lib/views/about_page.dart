@@ -17,7 +17,7 @@ class AboutPage extends StatelessWidget {
         // The text describing the app.
         final List<String> contents = [
           "About Us",
-          "This app is created by Eliah Reeves Christian Knab, and Eric Chuang from Merrill.\n",
+          "This app is created by Eliah Reeves, Christian Knab, and Eric Chuang from Merrill.\n",
           "Support Us",
           "Please help keep this app on the App Store by donating!",
         ];
