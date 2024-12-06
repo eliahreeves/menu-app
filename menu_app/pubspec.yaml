@@ -46,7 +46,7 @@ dependencies:
 
   firebase_database: ^10.2.5
   firebase_core: ^2.15.1
-  # marquee: ^2.2.3
+  marquee: ^2.3.0
   go_router: ^13.0.1
 
   open_mail_app: ^0.4.5
