@@ -175,8 +175,7 @@ class _HallIcon extends StatelessWidget {
   final double size;
   final String icon;
   const _HallIcon(
-      {super.key,
-      required this.onPressed,
+      {required this.onPressed,
       required this.size,
       required this.icon});
 

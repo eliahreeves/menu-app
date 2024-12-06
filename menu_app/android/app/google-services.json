@@ -3,7 +3,7 @@
     "project_number": "674482500876",
     "firebase_url": "https://ucsc-menu-app-default-rtdb.firebaseio.com",
     "project_id": "ucsc-menu-app",
-    "storage_bucket": "ucsc-menu-app.appspot.com"
+    "storage_bucket": "ucsc-menu-app.firebasestorage.app"
   },
   "client": [
     {
@@ -40,7 +40,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-1893777311600512~3895241305"
     }
   ],
   "configuration_version": "1"

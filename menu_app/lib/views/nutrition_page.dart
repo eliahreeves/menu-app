@@ -75,10 +75,10 @@ class NutritionLabel extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         // color: Theme.of(context).colorScheme.onSurface,
         // color: Color.fromARGB(255, 76, 76, 76),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Text(
         foodItem.name,
@@ -97,7 +97,7 @@ class NutritionLabel extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Serving size',
           ),
           const SizedBox(width: 4),
@@ -179,7 +179,7 @@ class NutritionLabel extends StatelessWidget {
                       // TODO FIXME when eric fixes scraper
                       if (allergy != "")
                         Padding(
-                          padding: EdgeInsets.only(left: 2),
+                          padding: const EdgeInsets.only(left: 2),
                           child: ClipOval(
                             child: Image.asset(
                               'icons/${allergy.toLowerCase()}',
@@ -195,7 +195,7 @@ class NutritionLabel extends StatelessWidget {
               ],
             ),
           )
-        : SizedBox();
+        : const SizedBox();
   }
 
   Widget _buildIngredients() {

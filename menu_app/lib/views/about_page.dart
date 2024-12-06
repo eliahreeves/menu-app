@@ -144,43 +144,43 @@ class AboutPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
-                  child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(
-                              Theme.of(context).colorScheme.onSurface)),
-                      onPressed: () =>
-                          Provider.of<AboutController>(context, listen: false)
-                              .openEmail(context),
-                      child: RichText(
-                        text: TextSpan(
-                          children: <TextSpan>[
-                            TextSpan(
-                                text: 'Email us! ',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme
-                                      .surface,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            TextSpan(
-                              text: '\uD83D\uDCE8', // emoji characters
-                              style: TextStyle(
-                                fontFamily: 'EmojiOne',
-                                fontSize: 15,
-                                shadows: [
-                                  Shadow(
-                                    color: Theme.of(context).colorScheme
-                                        .onSurfaceVariant, // Set the color to match your background
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
+                //   child: ElevatedButton(
+                //       style: ButtonStyle(
+                //           backgroundColor: WidgetStateProperty.all<Color>(
+                //               Theme.of(context).colorScheme.onSurface)),
+                //       onPressed: () =>
+                //           Provider.of<AboutController>(context, listen: false)
+                //               .openEmail(context),
+                //       child: RichText(
+                //         text: TextSpan(
+                //           children: <TextSpan>[
+                //             TextSpan(
+                //                 text: 'Email us! ',
+                //                 style: TextStyle(
+                //                   color: Theme.of(context).colorScheme
+                //                       .surface,
+                //                   fontWeight: FontWeight.bold,
+                //                 )),
+                //             TextSpan(
+                //               text: '\uD83D\uDCE8', // emoji characters
+                //               style: TextStyle(
+                //                 fontFamily: 'EmojiOne',
+                //                 fontSize: 15,
+                //                 shadows: [
+                //                   Shadow(
+                //                     color: Theme.of(context).colorScheme
+                //                         .onSurfaceVariant, // Set the color to match your background
+                //                     blurRadius: 10,
+                //                   ),
+                //                 ],
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       )),
+                // ),
                 const SizedBox(
                   height: 50,
                 ),
@@ -193,20 +193,20 @@ class AboutPage extends StatelessWidget {
   }
 }
 
-void showNoMailAppsDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Open Mail App"),
-        content: const Text("No mail apps installed"),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () => Navigator.pop(context),
-          )
-        ],
-      );
-    },
-  );
-}
+// void showNoMailAppsDialog(BuildContext context) {
+//   showDialog(
+//     context: context,
+//     builder: (context) {
+//       return AlertDialog(
+//         title: const Text("Open Mail App"),
+//         content: const Text("No mail apps installed"),
+//         actions: <Widget>[
+//           TextButton(
+//             child: const Text("OK"),
+//             onPressed: () => Navigator.pop(context),
+//           )
+//         ],
+//       );
+//     },
+//   );
+// }

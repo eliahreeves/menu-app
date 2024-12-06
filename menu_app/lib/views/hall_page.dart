@@ -249,7 +249,7 @@ class _CustomPainter extends BoxPainter {
     paint.color = color;
     paint.style = PaintingStyle.fill;
 
-    final double indicatorHeight = 4;
+    const double indicatorHeight = 4;
     final double radius = indicatorHeight / 2;
 
     canvas.drawRRect(

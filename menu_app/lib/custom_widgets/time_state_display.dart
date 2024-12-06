@@ -126,7 +126,7 @@ class _TimeStateDisplayState extends State<TimeStateDisplay> {
               events[nextPhaseIndex].name.startsWith("Continuous Dining")
                   ? "Continuous Dining"
                   : events[nextPhaseIndex].name;
-          return "${timeDif.inMinutes}m to ${eventName}";
+          return "${timeDif.inMinutes}m to $eventName";
         }
         final eventName =
             events[currentPhaseIndex].name.startsWith("Continuous Dining")

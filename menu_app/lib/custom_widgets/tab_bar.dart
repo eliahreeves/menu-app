@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:menu_app/controllers/home_page_controller.dart';
-import 'package:menu_app/views/home_page.dart';
 import 'package:provider/provider.dart';
 
 class CustomTabBar extends StatelessWidget {
