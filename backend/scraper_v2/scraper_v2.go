@@ -88,6 +88,10 @@ var menu = make(map[string]interface{})
 
 // main function
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	config := &firebase.Config{
 		DatabaseURL: "https://ucsc-menu-app-default-rtdb.firebaseio.com/",
 	}
@@ -683,11 +687,6 @@ func updateBanner(client *db.Client, setError bool) error {
 }
 
 func generateString() string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
 	if err != nil {
