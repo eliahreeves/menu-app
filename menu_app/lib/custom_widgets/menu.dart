@@ -95,7 +95,7 @@ Widget buildMeal(Future<List<FoodCategory>> hallSummary) {
                                     // TODO FIXME when eric fixes scraper
                             if(allergy != "")
                                       Padding(
-                                        padding: EdgeInsets.only(left: 2),
+                                        padding: const EdgeInsets.only(left: 2),
                                         child: ClipOval(
                                           child: Image.asset(
                                             'icons/${allergy.toLowerCase()}',

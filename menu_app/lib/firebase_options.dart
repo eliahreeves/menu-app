@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -55,7 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '674482500876',
     projectId: 'ucsc-menu-app',
     databaseURL: 'https://ucsc-menu-app-default-rtdb.firebaseio.com',
-    storageBucket: 'ucsc-menu-app.appspot.com',
+    storageBucket: 'ucsc-menu-app.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -64,8 +58,30 @@ class DefaultFirebaseOptions {
     messagingSenderId: '674482500876',
     projectId: 'ucsc-menu-app',
     databaseURL: 'https://ucsc-menu-app-default-rtdb.firebaseio.com',
-    storageBucket: 'ucsc-menu-app.appspot.com',
+    storageBucket: 'ucsc-menu-app.firebasestorage.app',
     iosClientId: '674482500876-kb5nooam1ib5f7g5j2frhu6g3tgfmatp.apps.googleusercontent.com',
     iosBundleId: 'com.orderofthecone.menu-app',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDfp00E8P_KiR70lAgeu7VYJ_5Lnvcs3Ig',
+    appId: '1:674482500876:web:839218e7b37774d461c529',
+    messagingSenderId: '674482500876',
+    projectId: 'ucsc-menu-app',
+    authDomain: 'ucsc-menu-app.firebaseapp.com',
+    databaseURL: 'https://ucsc-menu-app-default-rtdb.firebaseio.com',
+    storageBucket: 'ucsc-menu-app.firebasestorage.app',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAZW3VR0kAo8bjpJjcv0mT1nkFvZWMJgU0',
+    appId: '1:674482500876:ios:3f3d379eaa2e426b61c529',
+    messagingSenderId: '674482500876',
+    projectId: 'ucsc-menu-app',
+    databaseURL: 'https://ucsc-menu-app-default-rtdb.firebaseio.com',
+    storageBucket: 'ucsc-menu-app.firebasestorage.app',
+    iosClientId: '674482500876-kb5nooam1ib5f7g5j2frhu6g3tgfmatp.apps.googleusercontent.com',
+    iosBundleId: 'com.orderofthecone.menu-app',
+  );
+
 }

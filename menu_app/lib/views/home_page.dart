@@ -9,6 +9,7 @@ import 'package:menu_app/custom_widgets/banner.dart';
 import 'package:menu_app/utilities/constants.dart' as constants;
 import 'package:menu_app/views/nav_drawer.dart';
 import 'package:menu_app/controllers/home_page_controller.dart';
+import 'package:menu_app/custom_widgets/banner.dart' as banner;
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -77,6 +78,7 @@ class HomePage extends StatelessWidget {
                     child: ListView(
                       children: <Widget>[
                         // buildBanner(),
+                        const banner.Banner(),
                         // Display header text.
                         Container(
                           alignment: Alignment.topLeft,
@@ -173,8 +175,7 @@ class _HallIcon extends StatelessWidget {
   final double size;
   final String icon;
   const _HallIcon(
-      {super.key,
-      required this.onPressed,
+      {required this.onPressed,
       required this.size,
       required this.icon});
 
@@ -196,7 +197,9 @@ class _HallIcon extends StatelessWidget {
             ),
             borderRadius: const BorderRadius.all(Radius.circular(20)),
           ),
-          child:Center(child: SizedBox(width: size, height: size, child: Image.asset(icon)))),
+          child: Center(
+              child: SizedBox(
+                  width: size, height: size, child: Image.asset(icon)))),
       iconSize: size,
     );
   }
