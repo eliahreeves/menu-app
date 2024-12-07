@@ -25,3 +25,8 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+# get integration
+menu_app/lib/providers
+menu_app/lib/models/get_model*
+menu_app/lib/views/get*

@@ -1,12 +1,10 @@
-package scraper_v2
+package main
 
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -23,7 +21,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-// declarations
 var url = "https://nutrition.sa.ucsc.edu/"
 
 var diningHallNames = map[string]string{
@@ -88,6 +85,10 @@ var menu = make(map[string]interface{})
 
 // main function
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Printf("Error loading .env file")
+	}
 	config := &firebase.Config{
 		DatabaseURL: "https://ucsc-menu-app-default-rtdb.firebaseio.com/",
 	}
@@ -127,28 +128,30 @@ func main() {
 		return
 	}
 
-	// Create a file
-	file, err := os.Create("menu.json")
-	if err != nil {
-		fmt.Printf("error creating file: %v", err)
-	}
-	defer file.Close()
+	// // Create a file
+	// file, err := os.Create("menu.json")
+	// if err != nil {
+	// 	fmt.Printf("error creating file: %v", err)
+	// }
+	// defer file.Close()
 
-	// Write the menu to the file in a readable format
-	menuJson, err := json.MarshalIndent(menu, "", "  ")
-	if err != nil {
-		fmt.Printf("error marshalling menu: %v", err)
-	}
-	_, err = file.Write(menuJson)
-	if err != nil {
-		fmt.Printf("error writing to file: %v", err)
-	}
+	// // Write the menu to the file in a readable format
+	// menuJson, err := json.MarshalIndent(menu, "", "  ")
+	// if err != nil {
+	// 	fmt.Printf("error marshalling menu: %v", err)
+	// }
+	// _, err = file.Write(menuJson)
+	// if err != nil {
+	// 	fmt.Printf("error writing to file: %v", err)
+	// }
 
 	err = updateDatabase(db, menu)
 	if err != nil {
 		updateBanner(db, true)
 		fmt.Printf("error updating database: %v", err)
 	}
+
+	updateBanner(db, false)
 }
 
 // google cloud function
@@ -207,6 +210,7 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		return fmt.Errorf("error updating database: %v", err)
 	}
 
+	updateBanner(db, false)
 	return nil
 }
 
@@ -622,13 +626,9 @@ func updateDatabase(client *db.Client, hall_menus map[string]interface{}) error 
 	location, _ := time.LoadLocation("America/Los_Angeles")
 	lastScrapedTime := time.Now().In(location).Format("3:04 pm, 01/02")
 
-	lastScrapedRef := client.NewRef("/lastScraped")
-	if err := lastScrapedRef.Set(context.Background(), lastScrapedTime); err != nil {
+	if err := client.NewRef("/lastScraped").Set(context.Background(), lastScrapedTime); err != nil {
 		return fmt.Errorf("failed to update lastScraped: %w", err)
 	}
-
-	// Clear the banner
-	updateBanner(client, false)
 
 	return nil
 }
@@ -636,16 +636,14 @@ func updateDatabase(client *db.Client, hall_menus map[string]interface{}) error 
 func updateBanner(client *db.Client, setError bool) error {
 	if setError {
 		// Get the error message from /bannerError
-		bannerErrorRef := client.NewRef("/bannerError")
 		var bannerError string
-		if err := bannerErrorRef.Get(context.Background(), &bannerError); err != nil {
+		if err := client.NewRef("/bannerError").Get(context.Background(), &bannerError); err != nil {
 			return fmt.Errorf("failed to get bannerError: %w", err)
 		}
 
 		// Get the last scraped time from /lastScraped
-		lastScrapedRef := client.NewRef("/lastScraped")
 		var lastScraped string
-		if err := lastScrapedRef.Get(context.Background(), &lastScraped); err != nil {
+		if err := client.NewRef("/lastScraped").Get(context.Background(), &lastScraped); err != nil {
 			return fmt.Errorf("failed to get lastScraped: %w", err)
 		}
 
@@ -653,16 +651,12 @@ func updateBanner(client *db.Client, setError bool) error {
 		bannerMessage := fmt.Sprintf("%s%s", bannerError, lastScraped)
 
 		// Update the /Banner reference with the new message
-		bannerRef := client.NewRef("/Banner")
-		if err := bannerRef.Set(context.Background(), bannerMessage); err != nil {
+		if err := client.NewRef("/Banner").Set(context.Background(), bannerMessage); err != nil {
 			return fmt.Errorf("failed to update Banner: %w", err)
 		}
 	} else {
-		bannerRef := client.NewRef("/Banner")
-		aiPercentageRef := client.NewRef("/aiPercentage")
-
 		var aiPercentage float64
-		if err := aiPercentageRef.Get(context.Background(), &aiPercentage); err != nil {
+		if err := client.NewRef("/aiPercentage").Get(context.Background(), &aiPercentage); err != nil {
 			return fmt.Errorf("failed to get aiPercentage: %w", err)
 		}
 
@@ -670,11 +664,15 @@ func updateBanner(client *db.Client, setError bool) error {
 
 		randomValue := rand.Float64()
 		if randomValue < aiPercentage {
-			newBanner = generateString()
+			var err error
+			newBanner, err = generateString(client)
+			if err != nil {
+				newBanner = ""
+			}
 		} else {
 			newBanner = ""
 		}
-		if err := bannerRef.Set(context.Background(), newBanner); err != nil {
+		if err := client.NewRef("/Banner").Set(context.Background(), newBanner); err != nil {
 			return fmt.Errorf("failed to update Banner: %w", err)
 		}
 	}
@@ -682,25 +680,25 @@ func updateBanner(client *db.Client, setError bool) error {
 	return nil
 }
 
-func generateString() string {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
+func generateString(dbClient *db.Client) (string, error) {
 	ctx := context.Background()
 	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
 	if err != nil {
-		log.Fatal(err)
+		return "", fmt.Errorf("failed to init gemini: %w", err)
 	}
 	defer client.Close()
+
+	var prompt string
+	if err := dbClient.NewRef("/aiPrompt").Get(context.Background(), &prompt); err != nil {
+		return "", fmt.Errorf("failed to get prompt: %w", err)
+	}
 
 	model := client.GenerativeModel("gemini-1.5-flash")
 	model.SetTemperature(2)
 	model.SetMaxOutputTokens(50)
-	response, err := model.GenerateContent(ctx, genai.Text("Write a short and random sentence. Examples could be a news headline, fun fact, or a joke."))
+	response, err := model.GenerateContent(ctx, genai.Text(prompt))
 	if err != nil {
-		log.Fatal(err)
+		return "", fmt.Errorf("failed to generate: %w", err)
 	}
 
 	var sb strings.Builder
@@ -713,5 +711,5 @@ func generateString() string {
 		}
 	}
 
-	return sb.String()
+	return sb.String(), nil
 }
