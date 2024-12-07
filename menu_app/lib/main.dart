@@ -1,10 +1,12 @@
 // MAIN program.
 
 import 'package:flutter/material.dart';
+import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:menu_app/ads/ad_helper.dart';
 import 'package:menu_app/controllers/theme_provider.dart';
 import 'package:menu_app/controllers/time_notifier.dart';
-import 'package:menu_app/custom_widgets/ad_bar.dart';
-import 'package:menu_app/models/ads.dart';
+import 'package:menu_app/ads/ad_bar.dart';
 import 'package:menu_app/utilities/router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -14,29 +16,41 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 
 // MAIN function sets preferences.
 void main() async {
+  late final bool showAds;
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  Future.wait([
-    getAdBool(),
+
+  GmaMediationApplovin().setDoNotSell(true);
+  await Future.wait([
+    getAdBool().then((val) => showAds = val),
+    Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    ),
+    MobileAds.instance.initialize(),
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ])
+  ]);
+
+  await Future.wait([
+    // getAdBool(),
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  //AppLovinMAX.showMediationDebugger();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]).then((value) => runApp(MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => TimeNotifier())
-        ],
-        child: const MyApp(),
-      )));
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (context) => TimeNotifier())],
+    child: MyApp(
+      showAds: showAds,
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool showAds;
+  const MyApp({
+    super.key,
+    required this.showAds,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +85,7 @@ class MyApp extends StatelessWidget {
                   },
                 ),
               ),
-              const AdBar(),
+              if (showAds) const AdBar()
             ],
           ),
         );
