@@ -46,7 +46,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (context) => TimeNotifier())
         ],
-        child: const riverpod.ProviderScope(child: MyApp(showAds: showAds,)),
+        child: riverpod.ProviderScope(child: MyApp(showAds: showAds,)),
       )));
 }
 
