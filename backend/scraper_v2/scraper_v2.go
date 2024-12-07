@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"path"
@@ -16,6 +18,9 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
 	"github.com/gocolly/colly/v2"
+	"github.com/google/generative-ai-go/genai"
+	"github.com/joho/godotenv"
+	"google.golang.org/api/option"
 )
 
 // declarations
@@ -101,7 +106,7 @@ func main() {
 
 	err = scrape()
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		fmt.Printf("error in scrape function: %v\n", err)
 		return
 	}
@@ -110,14 +115,14 @@ func main() {
 
 	err = reorderCategories()
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		fmt.Printf("error in reorderCategories function: %v", err)
 		return
 	}
 
 	err = makeSummary()
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		fmt.Printf("error in makeSummary function: %v", err)
 		return
 	}
@@ -139,9 +144,9 @@ func main() {
 		fmt.Printf("error writing to file: %v", err)
 	}
 
-	err = UpdateDatabase(db, menu)
+	err = updateDatabase(db, menu)
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		fmt.Printf("error updating database: %v", err)
 	}
 }
@@ -174,31 +179,31 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		return fmt.Errorf("error in scrape function: %v", err)
 	}
 
 	err = reorderCategories()
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		return fmt.Errorf("error in reorderCategories function: %v", err)
 	}
 
 	err = makeSummary()
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		return fmt.Errorf("error in makeSummary function: %v", err)
 	}
 
 	for retry := 0; retry < maxRetries; retry++ {
-		err = UpdateDatabase(db, menu)
+		err = updateDatabase(db, menu)
 		if err == nil {
 			break
 		}
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
-		UpdateBannerError(db, true)
+		updateBanner(db, true)
 		return fmt.Errorf("error updating database: %v", err)
 	}
 
@@ -595,7 +600,7 @@ func makeSummary() error {
 }
 
 // Database function
-func UpdateDatabase(client *db.Client, hall_menus map[string]interface{}) error {
+func updateDatabase(client *db.Client, hall_menus map[string]interface{}) error {
 	ref := client.NewRef("/menuv2/")
 
 	// Save the current state of the database
@@ -623,13 +628,13 @@ func UpdateDatabase(client *db.Client, hall_menus map[string]interface{}) error 
 	}
 
 	// Clear the banner
-	UpdateBannerError(client, false)
+	updateBanner(client, false)
 
 	return nil
 }
 
-func UpdateBannerError(client *db.Client, error bool) error {
-	if error {
+func updateBanner(client *db.Client, setError bool) error {
+	if setError {
 		// Get the error message from /bannerError
 		bannerErrorRef := client.NewRef("/bannerError")
 		var bannerError string
@@ -653,12 +658,60 @@ func UpdateBannerError(client *db.Client, error bool) error {
 			return fmt.Errorf("failed to update Banner: %w", err)
 		}
 	} else {
-		// Clear the /Banner
 		bannerRef := client.NewRef("/Banner")
-		if err := bannerRef.Set(context.Background(), ""); err != nil {
+		aiPercentageRef := client.NewRef("/aiPercentage")
+
+		var aiPercentage float64
+		if err := aiPercentageRef.Get(context.Background(), &aiPercentage); err != nil {
+			return fmt.Errorf("failed to get aiPercentage: %w", err)
+		}
+
+		var newBanner string
+
+		randomValue := rand.Float64()
+		if randomValue < aiPercentage {
+			newBanner = generateString()
+		} else {
+			newBanner = ""
+		}
+		if err := bannerRef.Set(context.Background(), newBanner); err != nil {
 			return fmt.Errorf("failed to update Banner: %w", err)
 		}
 	}
 
 	return nil
+}
+
+func generateString() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	model := client.GenerativeModel("gemini-1.5-flash")
+	model.SetTemperature(2)
+	model.SetMaxOutputTokens(50)
+	response, err := model.GenerateContent(ctx, genai.Text("Write a short and random sentence. Examples could be a news headline, fun fact, or a joke."))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var sb strings.Builder
+	for _, cand := range response.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				sb.WriteString(fmt.Sprintf("%v", part))
+				sb.WriteString("\n")
+			}
+		}
+	}
+
+	return sb.String()
 }
