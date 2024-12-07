@@ -31,7 +31,7 @@ class _BannerState extends State<Banner> {
                   height: 30,
                   color: const Color.fromARGB(100, 0, 60, 108),
                   child: Marquee(
-                    text: (bannerText ?? '').trim(),
+                    text: (bannerText ?? '').trim().replaceAll(r'\n', ''),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                     scrollAxis: Axis.horizontal,
                     crossAxisAlignment: CrossAxisAlignment.center,
