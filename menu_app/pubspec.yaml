@@ -40,7 +40,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
-  applovin_max: ^4.0.0
 
   app_tracking_transparency: ^2.0.3
 
@@ -50,7 +49,8 @@ dependencies:
   go_router: ^13.0.1
   provider: ^6.1.1
   flutter_colorpicker: ^1.1.0
-  flutter_svg: ^2.0.16
+  google_mobile_ads: ^5.2.0
+  gma_mediation_applovin: ^1.2.0  flutter_svg: ^2.0.16
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   webview_flutter: ^4.10.0
