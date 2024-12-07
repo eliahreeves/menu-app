@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:menu_app/custom_widgets/summary.dart';
 import 'package:menu_app/custom_widgets/tab_bar.dart';
-import 'package:menu_app/providers/get_provider.dart';
+// import 'package:menu_app/providers/get_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -58,17 +58,17 @@ class HomePage extends StatelessWidget {
                 bottom: BorderSide(
                     color: Theme.of(context).colorScheme.secondary, width: 4)),
           ),
-          floatingActionButton: riverpod.Consumer(
-            builder: (context, ref, child) {
-              return FloatingActionButton(
-                onPressed: () => ref
-                    .read(getNavigationHandlerProvider.notifier)
-                    .handleSessionCheck(context),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                child: SvgPicture.asset('icons/barcode.svg'),
-              );
-            },
-          ),
+          // floatingActionButton: riverpod.Consumer(
+          //   builder: (context, ref, child) {
+          //     return FloatingActionButton(
+          //       onPressed: () => ref
+          //           .read(getNavigationHandlerProvider.notifier)
+          //           .handleSessionCheck(context),
+          //       backgroundColor: Theme.of(context).colorScheme.primary,
+          //       child: SvgPicture.asset('icons/barcode.svg'),
+          //     );
+          //   },
+          // ),
 
           body: RefreshIndicator(
             onRefresh:
