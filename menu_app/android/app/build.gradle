@@ -59,13 +59,15 @@ android {
 flutter {
     source = "../.."
 }
-
-repositories {
-    google()
-    mavenCentral()
-
-}
 dependencies {
-    implementation("com.applovin:applovin-sdk:+")
-    implementation("com.applovin.mediation:google-adapter:+")
+  implementation("com.google.android.ump:user-messaging-platform:+")
 }
+// repositories {
+//     google()
+//     mavenCentral()
+
+// }
+// dependencies {
+//     implementation("com.applovin:applovin-sdk:+")
+//     implementation("com.applovin.mediation:google-adapter:+")
+// }
