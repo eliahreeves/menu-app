@@ -1,6 +1,7 @@
 // MAIN program.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:menu_app/controllers/theme_provider.dart';
 import 'package:menu_app/controllers/time_notifier.dart';
 import 'package:menu_app/custom_widgets/ad_bar.dart';
@@ -31,7 +32,7 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (context) => TimeNotifier())
         ],
-        child: const MyApp(),
+        child: const riverpod.ProviderScope(child: MyApp()),
       )));
 }
 
