@@ -46,7 +46,10 @@ void main() async {
         providers: [
           ChangeNotifierProvider(create: (context) => TimeNotifier())
         ],
-        child: riverpod.ProviderScope(child: MyApp(showAds: showAds,)),
+        child: riverpod.ProviderScope(
+            child: MyApp(
+          showAds: showAds,
+        )),
       )));
 }
 
@@ -65,35 +68,38 @@ class MyApp extends StatelessWidget {
       ],
       builder: (context, child) {
         return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Column(
-            children: [
-              Expanded(
-                child: Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
-                    return MaterialApp.router(
-                      debugShowCheckedModeBanner: false,
-                      // Ignores IOS set to bold text
-                      builder: (context, child) => MediaQuery(
-                        data: MediaQuery.of(context).copyWith(boldText: false),
-                        child: child!,
-                      ),
-                      theme: ThemeData(
-                        useMaterial3: true,
-                        colorScheme: themeProvider.colorScheme,
-                        buttonTheme: const ButtonThemeData(
-                          colorScheme: ColorScheme.dark(),
-                        ),
-                      ),
-                      routerConfig: goRouter,
-                    );
-                  },
-                ),
+            debugShowCheckedModeBanner: false,
+            home: SafeArea(
+              top: false,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Consumer<ThemeProvider>(
+                      builder: (context, themeProvider, child) {
+                        return MaterialApp.router(
+                          debugShowCheckedModeBanner: false,
+                          // Ignores IOS set to bold text
+                          builder: (context, child) => MediaQuery(
+                            data: MediaQuery.of(context)
+                                .copyWith(boldText: false),
+                            child: child!,
+                          ),
+                          theme: ThemeData(
+                            useMaterial3: true,
+                            colorScheme: themeProvider.colorScheme,
+                            buttonTheme: const ButtonThemeData(
+                              colorScheme: ColorScheme.dark(),
+                            ),
+                          ),
+                          routerConfig: goRouter,
+                        );
+                      },
+                    ),
+                  ),
+                  if (showAds) const AdBar()
+                ],
               ),
-              if (showAds) const AdBar()
-            ],
-          ),
-        );
+            ));
       },
     );
   }

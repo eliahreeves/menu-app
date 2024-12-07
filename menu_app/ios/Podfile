@@ -37,6 +37,7 @@ target 'Runner' do
   # pod 'AppLovinMediationInMobiAdapter'
   pod 'Firebase/Analytics'
   # pod 'Google-Mobile-Ads-SDK'
+  pod 'GoogleUserMessagingPlatform'
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end
 
