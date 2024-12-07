@@ -1,6 +1,7 @@
 // MAIN program.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:menu_app/ads/ad_helper.dart';
@@ -37,12 +38,16 @@ void main() async {
     FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true)
   ]);
 
-  runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (context) => TimeNotifier())],
-    child: MyApp(
-      showAds: showAds,
-    ),
-  ));
+  //AppLovinMAX.showMediationDebugger();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((value) => runApp(MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => TimeNotifier())
+        ],
+        child: riverpod.ProviderScope(child: MyApp(showAds: showAds,)),
+      )));
 }
 
 class MyApp extends StatelessWidget {
