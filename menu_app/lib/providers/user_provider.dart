@@ -1,8 +1,6 @@
-import 'dart:convert';
-
+import 'package:get_mobile_interface/get_mobile_interface.dart';
 import 'package:menu_app/providers/get_auth_notifier.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:http/http.dart' as http;
 
 part '../generated/providers/user_provider.g.dart';
 
@@ -21,29 +19,8 @@ class GetUser extends _$GetUser {
       return;
     }
 
-    final url = Uri.parse(
-        "https://services.get.cbord.com/GETServices/services/json/user");
-    final headers = {
-      "accept": "application/json",
-      "content-type": "application/json",
-    };
-    final payload = jsonEncode({
-      "method": "retrieve",
-      "params": {
-        "sessionId": sessionId,
-      },
-    });
-
-    final response = await http.post(url, headers: headers, body: payload);
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      // List<dynamic> firstName = data["response"]["firstName"];
-      // List<dynamic> lastName = data["response"]["lastName"];
-      if (data["response"] == null) {
-        return;
-      }
-      state =
-          "${data["response"]["firstName"]} ${data["response"]["lastName"]}";
-    }
+    final name = await getName(sessionId);
+    if(name == null) return;
+    state = name;
   }
 }
