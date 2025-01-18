@@ -45,3 +45,5 @@ Supported on Android and iOS.
 * Click the specific dining hall for a detailed list of all food items.
 * Switch between Breakfast, Lunch, Dinner, and Late Night.
 * Automatically displays meal time based on time of day.
+
+flutter build apk --obfuscate --split-debug-info=/menu-app/symbols

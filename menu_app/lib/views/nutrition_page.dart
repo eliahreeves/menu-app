@@ -49,7 +49,7 @@ class NutritionLabel extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 30, 30, 30),
+            color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Column(

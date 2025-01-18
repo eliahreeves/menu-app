@@ -121,7 +121,17 @@ Future<String> fetchBanner() async {
     return snapshot.value as String;
   }
 
-  return 'null';
+  return '';
+}
+
+Future<String> fetchUpdateTime() async {
+  final DatabaseReference ref = FirebaseDatabase.instance.ref();
+  final snapshot = await ref.child('lastScraped').get();
+  if (snapshot.exists && snapshot.value != '') {
+    return snapshot.value as String;
+  }
+
+  return '';
 }
 
 Future<List<FoodCategory>> fetchSummary(String college, String mealTime) async {
@@ -151,7 +161,7 @@ Future<List<FoodCategory>> fetchSummary(String college, String mealTime) async {
 }
 
 Future<List<FoodCategory>> fetchSummaryList(
-    List<String> colleges, String mealTime) async {
+  List<String> colleges, String mealTime) async {
   List<Future<List<FoodCategory>>> futures = [];
 
   for (var college in colleges) {
@@ -211,37 +221,37 @@ Future<List<FoodCategory>> fetchAlbum(String college, String mealTime,
   }
 }
 
-class Hours {
-  final String day;
-  final String schedule;
+// class Hours {
+//   final String day;
+//   final String schedule;
 
-  Hours(this.day, this.schedule);
-}
+//   Hours(this.day, this.schedule);
+// }
 
-Future<List<Hours>> fetchHoursFromDatabase(String name) async {
-  final DatabaseReference ref = FirebaseDatabase.instance.ref();
+// Future<List<Hours>> fetchHoursFromDatabase(String name) async {
+//   final DatabaseReference ref = FirebaseDatabase.instance.ref();
 
-  final snapshot = await ref.child('Hours/$name').get();
-  if (snapshot.exists) {
-    final data = snapshot.value as List<dynamic>;
+//   final snapshot = await ref.child('Hours/$name').get();
+//   if (snapshot.exists) {
+//     final data = snapshot.value as List<dynamic>;
 
-    final hoursList = <Hours>[];
+//     final hoursList = <Hours>[];
 
-    for (int i = 0; i < data.length; i++) {
-      final dayData = data[i];
-      if (dayData != null && dayData is Map<dynamic, dynamic>) {
-        final dayKey = dayData.keys.first.toString();
-        final schedule =
-            dayData.values.first.toString().replaceAll('\\n', '\n');
-        hoursList.add(Hours(dayKey, schedule));
-      }
-    }
+//     for (int i = 0; i < data.length; i++) {
+//       final dayData = data[i];
+//       if (dayData != null && dayData is Map<dynamic, dynamic>) {
+//         final dayKey = dayData.keys.first.toString();
+//         final schedule =
+//             dayData.values.first.toString().replaceAll('\\n', '\n');
+//         hoursList.add(Hours(dayKey, schedule));
+//       }
+//     }
 
-    return hoursList;
-  } else {
-    return [];
-  }
-}
+//     return hoursList;
+//   } else {
+//     return [];
+//   }
+// }
 
 Future<Map<String, String>> fetchWaitzMap() async {
   Map<String, String> locations = {};

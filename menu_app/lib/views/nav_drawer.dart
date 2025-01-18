@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:menu_app/utilities/constants.dart' as constants;
-// TODO make controller
+import 'package:flutter_lucide/flutter_lucide.dart';
+
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
   @override
@@ -13,7 +14,6 @@ class NavDrawer extends StatelessWidget {
     return SizedBox(
         width: screenWidth,
         child: Drawer(
-          
           backgroundColor: const Color(constants.backgroundColor),
           child: ListView(
             padding: EdgeInsets.zero,
@@ -29,7 +29,7 @@ class NavDrawer extends StatelessWidget {
                 decoration: const BoxDecoration(
                     border: Border(
                         bottom: BorderSide(
-                            width: constants.borderWidth,
+                            width: constants.borderWidth * 0.25,
                             color: Color(constants.darkGray)))),
                 height: (screenWidth * 0.75) * 0.8,
                 child: Image(
@@ -41,7 +41,7 @@ class NavDrawer extends StatelessWidget {
               // Link to Homepage.
               ListTile(
                 leading: const Icon(
-                  Icons.house,
+                  LucideIcons.house,
                   color: Color(constants.menuColor),
                 ),
                 title: const Text(
@@ -54,19 +54,17 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () => {
-                  if(ModalRoute.of(context)?.settings.name != "Home") {
-                    context.pushReplacement('/')
-                  }
-                  else {
-                    context.pop()
-                  }
+                  if (ModalRoute.of(context)?.settings.name != "Home")
+                    {context.pushReplacement('/')}
+                  else
+                    {context.pop()}
                 },
               ),
 
               // Link to Calculator.
               ListTile(
                 leading: const Icon(
-                  Icons.calculate,
+                  LucideIcons.calculator,
                   color: Color(constants.menuColor),
                 ),
                 title: const Text(
@@ -79,19 +77,17 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () => {
-                  if(ModalRoute.of(context)?.settings.name != "Calculator") {
-                    context.pushReplacement('/Calculator')
-                  }
-                  else {
-                    context.pop()
-                  }
+                  if (ModalRoute.of(context)?.settings.name != "Calculator")
+                    {context.pushReplacement('/Calculator')}
+                  else
+                    {context.pop()}
                 },
               ),
 
               // Link to Settings Page
               ListTile(
                 leading: const Icon(
-                  Icons.settings,
+                  LucideIcons.settings_2,
                   color: Color(constants.menuColor),
                 ),
                 title: const Text(
@@ -104,19 +100,17 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () => {
-                  if(ModalRoute.of(context)?.settings.name != "Settings") {
-                    context.pushReplacement('/Settings')
-                  }
-                  else {
-                    context.pop()
-                  }
+                  if (ModalRoute.of(context)?.settings.name != "Settings")
+                    {context.pushReplacement('/Settings')}
+                  else
+                    {context.pop()}
                 },
               ),
 
               // Link to About Us page.
               ListTile(
                 leading: const Icon(
-                  Icons.info_outline,
+                  LucideIcons.info,
                   color: Color(constants.menuColor),
                 ),
                 title: const Text(
@@ -129,12 +123,10 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 onTap: () => {
-                  if(ModalRoute.of(context)?.settings.name != "About") {
-                    context.pushReplacement('/About')
-                  }
-                  else {
-                    context.pop()
-                  }
+                  if (ModalRoute.of(context)?.settings.name != "About")
+                    {context.pushReplacement('/About')}
+                  else
+                    {context.pop()}
                 },
               ),
             ],

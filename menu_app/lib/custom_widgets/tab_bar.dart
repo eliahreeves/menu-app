@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:menu_app/controllers/home_page_controller.dart';
-import 'package:provider/provider.dart';
 
 class CustomTabBar extends StatelessWidget {
+  final int selectedIndex;
+  final void Function(int) selectIndex;
   const CustomTabBar({
+    required this.selectedIndex,
     super.key,
+    required this.selectIndex,
   });
 
   @override
@@ -13,15 +15,31 @@ class CustomTabBar extends StatelessWidget {
     return SizedBox(
         width: width,
         height: 30, // Adjust the height as needed
-        child: const Padding(
-          padding: EdgeInsets.only(left: 14, right: 14),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _Button(text: "Breakfast", index: 0),
-              _Button(text: "Lunch", index: 1),
-              _Button(text: "Dinner", index: 2),
-              _Button(text: "Late Night", index: 3),
+              _Button(
+                  text: "Breakfast",
+                  index: 0,
+                  selectedIndex: selectedIndex,
+                  selectIndex: selectIndex),
+              _Button(
+                  text: "Lunch",
+                  index: 1,
+                  selectedIndex: selectedIndex,
+                  selectIndex: selectIndex),
+              _Button(
+                  text: "Dinner",
+                  index: 2,
+                  selectedIndex: selectedIndex,
+                  selectIndex: selectIndex),
+              _Button(
+                  text: "Late Night",
+                  index: 3,
+                  selectedIndex: selectedIndex,
+                  selectIndex: selectIndex),
               //_Button(text: AppLocalizations.of(context)!.oldTab, index: 3),
             ],
           ),
@@ -32,17 +50,21 @@ class CustomTabBar extends StatelessWidget {
 class _Button extends StatelessWidget {
   final String text;
   final int index;
+  final int selectedIndex;
+  final void Function(int) selectIndex;
 
-  const _Button({required this.text, required this.index});
+  const _Button(
+      {required this.text,
+      required this.index,
+      required this.selectedIndex,
+      required this.selectIndex});
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final isActive =
-        Provider.of<HomePageController>(context, listen: true).index == index;
+    final isActive = selectedIndex == index;
     return GestureDetector(
-      onTap: () => Provider.of<HomePageController>(context, listen: false)
-          .onTabPressed(index),
+      onTap: () => selectIndex(index),
       child: SizedBox(
           width: width * 0.23,
           child: Center(

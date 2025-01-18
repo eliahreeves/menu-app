@@ -706,7 +706,6 @@ func generateString(dbClient *db.Client) (string, error) {
 		if cand.Content != nil {
 			for _, part := range cand.Content.Parts {
 				sb.WriteString(fmt.Sprintf("%v", part))
-				sb.WriteString("\n")
 			}
 		}
 	}

@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:menu_app/controllers/time_notifier.dart';
-import 'package:provider/provider.dart';
+import 'package:menu_app/providers/hours_provider.dart';
 import '../utilities/constants.dart' as c;
 
-class TimeModalWidget extends StatefulWidget {
+class TimeModalWidget extends ConsumerStatefulWidget {
   final String name;
   final double width;
 
   const TimeModalWidget({super.key, required this.name, required this.width});
 
   @override
-  State<TimeModalWidget> createState() => _TimeModalWidgetState();
+  ConsumerState<TimeModalWidget> createState() => _TimeModalWidgetState();
 }
 
-class _TimeModalWidgetState extends State<TimeModalWidget>
+class _TimeModalWidgetState extends ConsumerState<TimeModalWidget>
     with TickerProviderStateMixin {
-  late final TimeNotifier _controller;
   late final PageController _tabController;
   late final PageController _pageController;
   static const double _tabWidth = 100.0;
@@ -25,18 +24,9 @@ class _TimeModalWidgetState extends State<TimeModalWidget>
   bool _isTabBarMoving = false;
   @override
   void initState() {
-    // _tabController = TabController(
-    //     length: c.daysOfWeek.length,
-    //     vsync: this,
-    //     initialIndex:
-    //         c.daysOfWeek.indexOf(DateFormat('EEEE').format(DateTime.now())));
-
     _tabController = PageController(
         initialPage: initialIndex, viewportFraction: _tabWidth / widget.width);
     _pageController = PageController(initialPage: initialIndex);
-
-    _controller = context.read<TimeNotifier>();
-    Future.microtask(() => _controller.pullHours(widget.name));
     super.initState();
   }
 
@@ -47,128 +37,237 @@ class _TimeModalWidgetState extends State<TimeModalWidget>
     super.dispose();
   }
 
-
-  
   @override
   Widget build(BuildContext context) {
-    return Consumer<TimeNotifier>(
-      builder: (context, timeNotifier, child) {
-        final hallHours = timeNotifier.hoursEvents[widget.name];
-        if (hallHours == null) {
-          return Column(
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: 20,
+    final hallHoursAsync = ref.watch(hallHoursProvider(widget.name));
+
+    return hallHoursAsync.when(
+      data: (hallHours) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerUp: (_) {
+                setState(() {
+                  _isTabBarMoving = false;
+                });
+              },
+              onPointerDown: (_) {
+                setState(() {
+                  _isTabBarMoving = true;
+                });
+              },
+              child: CustomScrollableTabs(
+                initial: initialIndex,
+                onPageChange: (i) {
+                  _pageController.animateToPage(i,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.decelerate);
+                },
+                tabs: c.daysOfWeek,
+                controller: _tabController,
               ),
-              const CircularProgressIndicator(),
-            ],
-          );
-        } else {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Listener(
-                behavior: HitTestBehavior.translucent,
-                onPointerUp: (_) {
-                  setState(() {
-                    _isTabBarMoving = false;
-                  });
-                },
-                onPointerDown: (_) {
-                  setState(() {
-                    _isTabBarMoving = true;
-                  });
-                },
-                child: CustomScrollableTabs(
-                  initial: initialIndex,
-                  onPageChange: (i) {
-                    _pageController.animateToPage(i,
+            ),
+            Expanded(
+              child: InfiniteTabBarView(
+                isScrollable: !_isTabBarMoving,
+                onPageChange: (i) {
+                  if (_tabController.page ==
+                      _tabController.page!.roundToDouble()) {
+                    _tabController.animateToPage(i,
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.decelerate);
-                  },
-                  tabs: c.daysOfWeek,
-                  controller: _tabController,
-                ),
-              ),
-              Expanded(
-                child: InfiniteTabBarView(
-                  isScrollable: !_isTabBarMoving,
-                  onPageChange: (i) {
-                    if (_tabController.page ==
-                        _tabController.page!.roundToDouble()) {
-                      _tabController.animateToPage(i,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.decelerate);
-                      // }
-                    }
-                  }, //_tabController.jumpToPage,
-                  controller: _pageController,
-                  children: [
-                    for (final day in c.daysOfWeek)
-                      Column(children: [
-                        hallHours[day] == null
-                            ? const Text(
-                                "Closed",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              )
-                            : Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                child: Column(
-                                  children: [
-                                    for (int i = 0;
-                                        i < hallHours[day]!.length - 1;
-                                        i++)
-                                      Row(children: [
-                                        SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.3,
-                                          child: Text(
-                                            hallHours[day]![i]
-                                                    .name
-                                                    .startsWith("Continuous")
-                                                ? "Continuous"
-                                                : hallHours[day]![i].name,
-                                            style: const TextStyle(
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.16),
-                                        Text(
-                                          "${hallHours[day]![i].time.format(context)} - ${hallHours[day]![i + 1].time.format(context)}",
+                    // }
+                  }
+                }, //_tabController.jumpToPage,
+                controller: _pageController,
+                children: [
+                  for (final day in c.daysOfWeek)
+                    Column(children: [
+                      hallHours[day] == null
+                          ? const Text(
+                              "Closed",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            )
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Column(
+                                children: [
+                                  for (int i = 0;
+                                      i < hallHours[day]!.length - 1;
+                                      i++)
+                                    Row(children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.3,
+                                        child: Text(
+                                          hallHours[day]![i]
+                                                  .name
+                                                  .startsWith("Continuous")
+                                              ? "Continuous"
+                                              : hallHours[day]![i].name,
                                           style: const TextStyle(
                                               color: Colors.black),
                                         ),
-                                      ])
-                                  ],
-                                )),
-                        const Padding(
-                            padding: EdgeInsets.only(top: 20),
-                            child: Text(
-                              "*Does not reflect special hours.",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 161, 161, 161)),
-                            ))
-                      ])
-                  ],
-                ),
-              )
-            ],
-          );
-        }
+                                      ),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.16),
+                                      Text(
+                                        "${hallHours[day]![i].time.format(context)} - ${hallHours[day]![i + 1].time.format(context)}",
+                                        style: const TextStyle(
+                                            color: Colors.black),
+                                      ),
+                                    ])
+                                ],
+                              )),
+                      const Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "*Does not reflect special hours.",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 161, 161, 161)),
+                          ))
+                    ])
+                ],
+              ),
+            )
+          ],
+        );
+      },
+      loading: () {
+        return Column(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 20,
+            ),
+            const CircularProgressIndicator(),
+          ],
+        );
+      },
+      error: (error, stack) {
+        return Text('Error: $error');
       },
     );
+
+    // if (hallHours == null) {
+    //   return Column(
+    //     children: [
+    //       SizedBox(
+    //         width: MediaQuery.of(context).size.width,
+    //         height: 20,
+    //       ),
+    //       const CircularProgressIndicator(),
+    //     ],
+    //   );
+    // } else {
+    //   return Column(
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: [
+    //       Listener(
+    //         behavior: HitTestBehavior.translucent,
+    //         onPointerUp: (_) {
+    //           setState(() {
+    //             _isTabBarMoving = false;
+    //           });
+    //         },
+    //         onPointerDown: (_) {
+    //           setState(() {
+    //             _isTabBarMoving = true;
+    //           });
+    //         },
+    //         child: CustomScrollableTabs(
+    //           initial: initialIndex,
+    //           onPageChange: (i) {
+    //             _pageController.animateToPage(i,
+    //                 duration: const Duration(milliseconds: 300),
+    //                 curve: Curves.decelerate);
+    //           },
+    //           tabs: c.daysOfWeek,
+    //           controller: _tabController,
+    //         ),
+    //       ),
+    //       Expanded(
+    //         child: InfiniteTabBarView(
+    //           isScrollable: !_isTabBarMoving,
+    //           onPageChange: (i) {
+    //             if (_tabController.page ==
+    //                 _tabController.page!.roundToDouble()) {
+    //               _tabController.animateToPage(i,
+    //                   duration: const Duration(milliseconds: 300),
+    //                   curve: Curves.decelerate);
+    //               // }
+    //             }
+    //           }, //_tabController.jumpToPage,
+    //           controller: _pageController,
+    //           children: [
+    //             for (final day in c.daysOfWeek)
+    //               Column(children: [
+    //                 hallHours[day] == null
+    //                     ? const Text(
+    //                         "Closed",
+    //                         textAlign: TextAlign.center,
+    //                         style: TextStyle(
+    //                           color: Colors.black,
+    //                         ),
+    //                       )
+    //                     : Padding(
+    //                         padding: const EdgeInsets.symmetric(horizontal: 20),
+    //                         child: Column(
+    //                           children: [
+    //                             for (int i = 0;
+    //                                 i < hallHours[day]!.length - 1;
+    //                                 i++)
+    //                               Row(children: [
+    //                                 SizedBox(
+    //                                   width: MediaQuery.of(context).size.width *
+    //                                       0.3,
+    //                                   child: Text(
+    //                                     hallHours[day]![i]
+    //                                             .name
+    //                                             .startsWith("Continuous")
+    //                                         ? "Continuous"
+    //                                         : hallHours[day]![i].name,
+    //                                     style: const TextStyle(
+    //                                         color: Colors.black),
+    //                                   ),
+    //                                 ),
+    //                                 SizedBox(
+    //                                     width:
+    //                                         MediaQuery.of(context).size.width *
+    //                                             0.16),
+    //                                 Text(
+    //                                   "${hallHours[day]![i].time.format(context)} - ${hallHours[day]![i + 1].time.format(context)}",
+    //                                   style:
+    //                                       const TextStyle(color: Colors.black),
+    //                                 ),
+    //                               ])
+    //                           ],
+    //                         )),
+    //                 const Padding(
+    //                     padding: EdgeInsets.only(top: 20),
+    //                     child: Text(
+    //                       "*Does not reflect special hours.",
+    //                       textAlign: TextAlign.center,
+    //                       style: TextStyle(
+    //                           color: Color.fromARGB(255, 161, 161, 161)),
+    //                     ))
+    //               ])
+    //           ],
+    //         ),
+    //       )
+    //     ],
+    //   );
   }
 }
 

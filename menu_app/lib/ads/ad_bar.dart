@@ -2,29 +2,28 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:menu_app/utilities/constants.dart';
+import 'package:menu_app/providers/ad_state_provider.dart';
 import 'package:menu_app/ads/consent_manager.dart';
-import 'package:provider/provider.dart';
 
+// ignore: unused_element, non_constant_identifier_names
 final String _banner_ad_unit_ID =
     Platform.isAndroid ? 'e1fa1a7321d6419f' : '0de5490ded2e98f7';
 
-class AdBar extends StatefulWidget {
+class AdBar extends ConsumerStatefulWidget {
   const AdBar({super.key});
 
   @override
-  State<AdBar> createState() => _AdBarState();
+  ConsumerState<AdBar> createState() => _AdBarState();
 }
 
-class _AdBarState extends State<AdBar> {
+class _AdBarState extends ConsumerState<AdBar> {
   final _consentManager = ConsentManager();
   var _isMobileAdsInitializeCalled = false;
+  // ignore: unused_field
   var _isPrivacyOptionsRequired = false;
-  BannerAd? _bannerAd;
-  bool _isLoaded = false;
 
-  // TODO: replace this test ad unit with your own ad unit.
   final _adUnitId = Platform.isAndroid
       ? 'ca-app-pub-1893777311600512/8265461657'
       : 'ca-app-pub-1893777311600512/1538409384';
@@ -54,11 +53,12 @@ class _AdBarState extends State<AdBar> {
   /// Loads a banner ad.
   @override
   Widget build(BuildContext context) {
-    return (_bannerAd != null && _isLoaded)
+    final adState = ref.watch(adStateNotifierProvider);
+    return (adState.bannerAd != null && adState.isLoaded)
         ? SizedBox(
-            width: _bannerAd!.size.width.toDouble(),
-            height: _bannerAd!.size.height.toDouble(),
-            child: AdWidget(ad: _bannerAd!),
+            width: adState.bannerAd!.size.width.toDouble(),
+            height: adState.bannerAd!.size.height.toDouble(),
+            child: AdWidget(ad: adState.bannerAd!),
           )
         : const SizedBox();
   }
@@ -91,10 +91,14 @@ class _AdBarState extends State<AdBar> {
       listener: BannerAdListener(
         // Called when an ad is successfully received.
         onAdLoaded: (ad) {
-          setState(() {
-            _bannerAd = ad as BannerAd;
-            _isLoaded = true;
-          });
+          ref
+              .read(adStateNotifierProvider.notifier)
+              .updateAdState(bannerAd: ad as BannerAd, isLoaded: true);
+
+          // setState(() {
+          //   _bannerAd = ad as BannerAd;
+          //   _isLoaded = true;
+          // });
         },
         // Called when an ad request failed.
         onAdFailedToLoad: (ad, err) {

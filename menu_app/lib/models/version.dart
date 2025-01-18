@@ -7,7 +7,7 @@ Future<bool> performVersionCheck() async {
   String firebaseAppVersion = await getAppVersionFromFirebase();
 
   // Get the current app version
-  String currentAppVersion = await getCurrentAppVersion();
+  String currentAppVersion = (await getCurrentAppVersion()).version;
   // Compare versions
   if (compareVersions(currentAppVersion, firebaseAppVersion) >= 0) {
     // App is up-to-date or newer
@@ -18,9 +18,9 @@ Future<bool> performVersionCheck() async {
 }
 
 // Function to retrieve the current app version
-Future<String> getCurrentAppVersion() async {
+Future<PackageInfo> getCurrentAppVersion() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
-  return packageInfo.version;
+  return packageInfo;
 }
 
 // Replace this function with the actual function to retrieve the version from Firebase
