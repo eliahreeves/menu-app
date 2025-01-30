@@ -1,9 +1,11 @@
+# This script has the ability to add "Today", "Tomorrow", and "Day after tomorrow", as parents to all the colleges
+
 from playwright.sync_api import sync_playwright, ViewportSize
 import re
 import unicodedata
 from bs4 import BeautifulSoup
 from copy import deepcopy
-from datetime import datetime
+import datetime
 import data_base_write
 
 def menu_scrape():
@@ -43,9 +45,11 @@ def menu_scrape():
                 if index == 0:
                     options = date_option.locator("option").all_inner_texts()
                     for item in options:
-                        if str(datetime.now().day) in item:
+                        # temp = str(datetime.date.today().strftime('%e'))
+                        if str(datetime.date.today().strftime('%e')) in item:
                             index = options.index(item)                 # find index of current day's date
                             break
+
                 date_option.select_option(index=index)                  # select day
                 page.get_by_role("button", name="Go!").click()          # go to page
                 index += 1
@@ -55,6 +59,9 @@ def menu_scrape():
                 browser.close()
 
             menuTable = soup.find('table',  {'bordercolor': '#CCC'})    # Finds meal table
+
+            if menuTable == None:                                       # Error check if hall is closed
+                continue
 
             for meal in menuTable:                                      # For each item in the meal table, strip empty text
                 text = meal.text.strip()                                # and save the menu item
@@ -74,7 +81,7 @@ def menu_scrape():
 
             # Updates hall_menu dictionary
             for i in meals_list:
-                if i in meal_times.keys():                              # If Breakfast, Lunch, Dinner, or Late Night
+                if i in meal_times.keys():                              # If 'Breakfast', 'Lunch', 'Dinner', or 'Late Night'
                     meal_time = i                                       # Set current meal time
                     continue
                 elif "--" in i:                                         # If at a meal category
@@ -82,7 +89,12 @@ def menu_scrape():
                     meal_cat = meal_cat
                     continue
                 else:                                                   # Append meals to dictionary
-                    hall_menus[date][halls_name[j]][meal_time][meal_cat].append(i)
+                    # add to the dictionary if the meal category is not in the list
+                    try:
+                        hall_menus[date][halls_name[j]][meal_time][meal_cat].append(i)
+                    except:
+                        hall_menus[date][halls_name[j]][meal_time].update({meal_cat: []})
+                        hall_menus[date][halls_name[j]][meal_time][meal_cat].append(i)
 
     return hall_menus
 

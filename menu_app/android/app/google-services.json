@@ -3,14 +3,14 @@
     "project_number": "674482500876",
     "firebase_url": "https://ucsc-menu-app-default-rtdb.firebaseio.com",
     "project_id": "ucsc-menu-app",
-    "storage_bucket": "ucsc-menu-app.appspot.com"
+    "storage_bucket": "ucsc-menu-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:674482500876:android:573db7c641bc018f61c529",
+        "mobilesdk_app_id": "1:674482500876:android:a28efd933f85960861c529",
         "android_client_info": {
-          "package_name": "com.example.menu_app"
+          "package_name": "com.orderOfTheCone.android.menu_app"
         }
       },
       "oauth_client": [
@@ -40,7 +40,8 @@
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-1893777311600512~3895241305"
     }
   ],
   "configuration_version": "1"

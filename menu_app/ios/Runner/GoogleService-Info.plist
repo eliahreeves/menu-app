@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>674482500876-chma7rkrojbliqvvr764ileirifl4hve.apps.googleusercontent.com</string>
+	<string>674482500876-kb5nooam1ib5f7g5j2frhu6g3tgfmatp.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.674482500876-chma7rkrojbliqvvr764ileirifl4hve</string>
+	<string>com.googleusercontent.apps.674482500876-kb5nooam1ib5f7g5j2frhu6g3tgfmatp</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAZW3VR0kAo8bjpJjcv0mT1nkFvZWMJgU0</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,7 +17,7 @@
 	<key>PROJECT_ID</key>
 	<string>ucsc-menu-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ucsc-menu-app.appspot.com</string>
+	<string>ucsc-menu-app.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,8 +29,10 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:674482500876:ios:5ee16090548127a761c529</string>
+	<string>1:674482500876:ios:3f3d379eaa2e426b61c529</string>
 	<key>DATABASE_URL</key>
 	<string>https://ucsc-menu-app-default-rtdb.firebaseio.com</string>
+	<key>ADMOB_APP_ID</key>
+	<string>ca-app-pub-1893777311600512~4942182363</string>
 </dict>
 </plist>
