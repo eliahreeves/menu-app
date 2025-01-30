@@ -19,9 +19,9 @@ class SummaryList extends ConsumerWidget {
     final waitz = ref.watch(waitzCrowdStatusProvider);
     final summaries = ref.watch(summaryListDataProvider(mealTime));
     if (summaries.hasError) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showOverlay(context);
-      });
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   showOverlay(context);
+      // });
       
     }
     return Column(

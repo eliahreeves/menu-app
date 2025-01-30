@@ -225,9 +225,9 @@ class _CalculatorState extends ConsumerState<Calculator>
                                   try {
                                     await attempt();
                                   } catch (e) {
-                                    if (context.mounted) {
-                                      showOverlay(context);
-                                    }
+                                    // if (context.mounted) {
+                                    //   showOverlay(context);
+                                    // }
                                   }
                                 } else {
                                   if (context.mounted) {
@@ -237,14 +237,14 @@ class _CalculatorState extends ConsumerState<Calculator>
                                     try {
                                       await attempt();
                                     } catch (e) {
-                                      if (context.mounted) {
-                                        showOverlay(context);
-                                      }
+                                      // if (context.mounted) {
+                                      //   showOverlay(context);
+                                      // }
                                     }
                                   } else {
-                                    if (context.mounted) {
-                                      showOverlay(context);
-                                    }
+                                    // if (context.mounted) {
+                                    //   showOverlay(context);
+                                    // }
                                   }
                                 }
                               }
