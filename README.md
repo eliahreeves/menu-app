@@ -5,7 +5,7 @@ Menu app for all UC Santa Cruz Dining Locations created with Flutter.
 * [Google Play Store](https://play.google.com/store/apps/details?id=com.orderOfTheCone.android.menu_app)
 
 ### Authors
-* [Eliah Reeves](https://github.com/nunibye)
+* [Eliah Reeves](https://github.com/eliahreeves)
 * [Christian Knab](https://github.com/christianknab)
 * [Eric Chuang](https://github.com/ericbreh)
 ### Contact us
