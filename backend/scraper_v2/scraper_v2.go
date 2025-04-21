@@ -659,6 +659,10 @@ func updateBanner(client *db.Client, setError bool) error {
 		if err := client.NewRef("/aiPercentage").Get(context.Background(), &aiPercentage); err != nil {
 			return fmt.Errorf("failed to get aiPercentage: %w", err)
 		}
+		
+		if aiPercentage == 0 {
+			return nil
+		}
 
 		var newBanner string
 
