@@ -5,9 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 	"sync"
@@ -16,9 +14,7 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
 	"github.com/gocolly/colly/v2"
-	"github.com/google/generative-ai-go/genai"
 	"github.com/joho/godotenv"
-	"google.golang.org/api/option"
 )
 
 var url = "https://nutrition.sa.ucsc.edu/"
@@ -107,7 +103,7 @@ func main() {
 
 	err = scrape()
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		fmt.Printf("error in scrape function: %v\n", err)
 		return
 	}
@@ -116,14 +112,14 @@ func main() {
 
 	err = reorderCategories()
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		fmt.Printf("error in reorderCategories function: %v", err)
 		return
 	}
 
 	err = makeSummary()
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		fmt.Printf("error in makeSummary function: %v", err)
 		return
 	}
@@ -147,11 +143,11 @@ func main() {
 
 	err = updateDatabase(db, menu)
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		fmt.Printf("error updating database: %v", err)
 	}
 
-	updateBanner(db, false)
+	clearBannerError(db)
 }
 
 // google cloud function
@@ -182,19 +178,19 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		return fmt.Errorf("error in scrape function: %v", err)
 	}
 
 	err = reorderCategories()
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		return fmt.Errorf("error in reorderCategories function: %v", err)
 	}
 
 	err = makeSummary()
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		return fmt.Errorf("error in makeSummary function: %v", err)
 	}
 
@@ -206,11 +202,11 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		time.Sleep(retryDelay)
 	}
 	if err != nil {
-		updateBanner(db, true)
+		setBannerError(db)
 		return fmt.Errorf("error updating database: %v", err)
 	}
 
-	updateBanner(db, false)
+	clearBannerError(db)
 	return nil
 }
 
@@ -633,86 +629,38 @@ func updateDatabase(client *db.Client, hall_menus map[string]interface{}) error 
 	return nil
 }
 
-func updateBanner(client *db.Client, setError bool) error {
-	if setError {
-		// Get the error message from /bannerError
-		var bannerError string
-		if err := client.NewRef("/bannerError").Get(context.Background(), &bannerError); err != nil {
-			return fmt.Errorf("failed to get bannerError: %w", err)
-		}
-
-		// Get the last scraped time from /lastScraped
-		var lastScraped string
-		if err := client.NewRef("/lastScraped").Get(context.Background(), &lastScraped); err != nil {
-			return fmt.Errorf("failed to get lastScraped: %w", err)
-		}
-
-		// Create the banner message
-		bannerMessage := fmt.Sprintf("%s%s", bannerError, lastScraped)
-
-		// Update the /Banner reference with the new message
-		if err := client.NewRef("/Banner").Set(context.Background(), bannerMessage); err != nil {
-			return fmt.Errorf("failed to update Banner: %w", err)
-		}
-	} else {
-		var aiPercentage float64
-		if err := client.NewRef("/aiPercentage").Get(context.Background(), &aiPercentage); err != nil {
-			return fmt.Errorf("failed to get aiPercentage: %w", err)
-		}
-		
-		if aiPercentage == 0 {
-			return nil
-		}
-
-		var newBanner string
-
-		randomValue := rand.Float64()
-		if randomValue < aiPercentage {
-			var err error
-			newBanner, err = generateString(client)
-			if err != nil {
-				newBanner = ""
-			}
-		} else {
-			newBanner = ""
-		}
-		if err := client.NewRef("/Banner").Set(context.Background(), newBanner); err != nil {
-			return fmt.Errorf("failed to update Banner: %w", err)
-		}
+func setBannerError(client *db.Client) error {
+	// Get the last scraped time from /lastScraped
+	var lastScraped string
+	if err := client.NewRef("/lastScraped").Get(context.Background(), &lastScraped); err != nil {
+		return fmt.Errorf("failed to get lastScraped: %w", err)
 	}
 
+	// Create the banner message
+	bannerMessage := fmt.Sprintf("Data collection failed. Last updated: %s", lastScraped)
+
+	// Update the /Banner reference with the new message
+	if err := client.NewRef("/Banner").Set(context.Background(), bannerMessage); err != nil {
+		return fmt.Errorf("failed to update Banner: %w", err)
+	}
 	return nil
 }
 
-func generateString(dbClient *db.Client) (string, error) {
-	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey(os.Getenv("GEMINI_API_KEY")))
-	if err != nil {
-		return "", fmt.Errorf("failed to init gemini: %w", err)
-	}
-	defer client.Close()
-
-	var prompt string
-	if err := dbClient.NewRef("/aiPrompt").Get(context.Background(), &prompt); err != nil {
-		return "", fmt.Errorf("failed to get prompt: %w", err)
+func clearBannerError(client *db.Client) error {
+	// Get the current banner message
+	var currentBanner string
+	if err := client.NewRef("/Banner").Get(context.Background(), &currentBanner); err != nil {
+		return fmt.Errorf("failed to get current banner: %w", err)
 	}
 
-	model := client.GenerativeModel("gemini-1.5-flash")
-	model.SetTemperature(2)
-	model.SetMaxOutputTokens(50)
-	response, err := model.GenerateContent(ctx, genai.Text(prompt))
-	if err != nil {
-		return "", fmt.Errorf("failed to generate: %w", err)
-	}
-
-	var sb strings.Builder
-	for _, cand := range response.Candidates {
-		if cand.Content != nil {
-			for _, part := range cand.Content.Parts {
-				sb.WriteString(fmt.Sprintf("%v", part))
-			}
+	// Check if the banner contains the error message pattern
+	if strings.Contains(currentBanner, "Data collection failed. Last updated:") {
+		// Clear the banner by setting it to empty string
+		if err := client.NewRef("/Banner").Set(context.Background(), ""); err != nil {
+			return fmt.Errorf("failed to clear Banner: %w", err)
 		}
 	}
+	// If banner doesn't match error pattern, leave it as is
 
-	return sb.String(), nil
+	return nil
 }
