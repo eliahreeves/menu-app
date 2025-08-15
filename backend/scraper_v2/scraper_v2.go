@@ -91,10 +91,12 @@ func main() {
 	app, err := firebase.NewApp(context.Background(), config)
 	if err != nil {
 		fmt.Printf("error initializing app: %v", err)
+		return
 	}
 	db, err := app.Database(context.Background())
 	if err != nil {
 		fmt.Printf("error initializing database client: %v", err)
+		return
 	}
 
 	menu = make(map[string]interface{}) // clear menu map
@@ -145,6 +147,7 @@ func main() {
 	if err != nil {
 		setBannerError(db)
 		fmt.Printf("error updating database: %v", err)
+		return
 	}
 
 	clearBannerError(db)
