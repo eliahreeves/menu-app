@@ -186,7 +186,7 @@ class ThemeSettings extends ConsumerStatefulWidget {
 class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
   @override
   Widget build(BuildContext context) {
-    final theme = ref.watch(themeNotifierProvider);
+    final theme = ref.watch(themeProvider);
     final getMobileFabStatus = ref.watch(getMobileFabStatusProvider);
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -265,7 +265,7 @@ class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
                 CupertinoSwitch(
                     value: theme.isDefault,
                     onChanged: (val) => ref
-                        .read(themeNotifierProvider.notifier)
+                        .read(themeProvider.notifier)
                         .updateTheme(isDefault: val))
               ],
             ),
@@ -287,7 +287,7 @@ class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
                       _ColorPickerDisplay(
                           color: Theme.of(context).colorScheme.primary,
                           setColor: (color) => ref
-                              .read(themeNotifierProvider.notifier)
+                              .read(themeProvider.notifier)
                               .updateTheme(otherPrimary: color))
                     ],
                   )),
@@ -309,7 +309,7 @@ class _ThemeSettingsState extends ConsumerState<ThemeSettings> {
                       _ColorPickerDisplay(
                           color: Theme.of(context).colorScheme.secondary,
                           setColor: (color) => ref
-                              .read(themeNotifierProvider.notifier)
+                              .read(themeProvider.notifier)
                               .updateTheme(otherSecondary: color)),
                     ],
                   )),
@@ -336,7 +336,7 @@ class __ColorPickerDisplayState extends ConsumerState<_ColorPickerDisplay> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        if (ref.read(themeNotifierProvider).isDefault) {
+        if (ref.read(themeProvider).isDefault) {
           return;
         }
         showDialog(

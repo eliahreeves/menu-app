@@ -6,231 +6,131 @@ part of '../../providers/meal_album_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$mealAlbumHash() => r'f56d1a3cb7b940ec53907a289cbcd2ba0b2c0ed8';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$MealAlbum extends BuildlessAsyncNotifier<List<FoodCategory>> {
-  late final String college;
-  late final String mealTime;
-  late final String cat;
-  late final String day;
-
-  FutureOr<List<FoodCategory>> build(
-    String college,
-    String mealTime, {
-    String cat = "",
-    String day = "Today",
-  });
-}
-
-/// See also [MealAlbum].
 @ProviderFor(MealAlbum)
-const mealAlbumProvider = MealAlbumFamily();
+const mealAlbumProvider = MealAlbumFamily._();
 
-/// See also [MealAlbum].
-class MealAlbumFamily extends Family<AsyncValue<List<FoodCategory>>> {
-  /// See also [MealAlbum].
-  const MealAlbumFamily();
-
-  /// See also [MealAlbum].
-  MealAlbumProvider call(
-    String college,
-    String mealTime, {
-    String cat = "",
-    String day = "Today",
-  }) {
-    return MealAlbumProvider(
-      college,
-      mealTime,
-      cat: cat,
-      day: day,
-    );
-  }
-
-  @override
-  MealAlbumProvider getProviderOverride(
-    covariant MealAlbumProvider provider,
-  ) {
-    return call(
-      provider.college,
-      provider.mealTime,
-      cat: provider.cat,
-      day: provider.day,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'mealAlbumProvider';
-}
-
-/// See also [MealAlbum].
-class MealAlbumProvider
-    extends AsyncNotifierProviderImpl<MealAlbum, List<FoodCategory>> {
-  /// See also [MealAlbum].
-  MealAlbumProvider(
-    String college,
-    String mealTime, {
-    String cat = "",
-    String day = "Today",
-  }) : this._internal(
-          () => MealAlbum()
-            ..college = college
-            ..mealTime = mealTime
-            ..cat = cat
-            ..day = day,
-          from: mealAlbumProvider,
+final class MealAlbumProvider
+    extends $AsyncNotifierProvider<MealAlbum, List<FoodCategory>> {
+  const MealAlbumProvider._(
+      {required MealAlbumFamily super.from,
+      required (
+        String,
+        String, {
+        String cat,
+        String day,
+      })
+          super.argument})
+      : super(
+          retry: null,
           name: r'mealAlbumProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$mealAlbumHash,
-          dependencies: MealAlbumFamily._dependencies,
-          allTransitiveDependencies: MealAlbumFamily._allTransitiveDependencies,
-          college: college,
-          mealTime: mealTime,
-          cat: cat,
-          day: day,
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  MealAlbumProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.college,
-    required this.mealTime,
-    required this.cat,
-    required this.day,
-  }) : super.internal();
-
-  final String college;
-  final String mealTime;
-  final String cat;
-  final String day;
+  @override
+  String debugGetCreateSourceHash() => _$mealAlbumHash();
 
   @override
-  FutureOr<List<FoodCategory>> runNotifierBuild(
-    covariant MealAlbum notifier,
-  ) {
-    return notifier.build(
-      college,
-      mealTime,
-      cat: cat,
-      day: day,
-    );
+  String toString() {
+    return r'mealAlbumProvider'
+        ''
+        '$argument';
   }
 
+  @$internal
   @override
-  Override overrideWith(MealAlbum Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: MealAlbumProvider._internal(
-        () => create()
-          ..college = college
-          ..mealTime = mealTime
-          ..cat = cat
-          ..day = day,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        college: college,
-        mealTime: mealTime,
-        cat: cat,
-        day: day,
-      ),
-    );
-  }
-
-  @override
-  AsyncNotifierProviderElement<MealAlbum, List<FoodCategory>> createElement() {
-    return _MealAlbumProviderElement(this);
-  }
+  MealAlbum create() => MealAlbum();
 
   @override
   bool operator ==(Object other) {
-    return other is MealAlbumProvider &&
-        other.college == college &&
-        other.mealTime == mealTime &&
-        other.cat == cat &&
-        other.day == day;
+    return other is MealAlbumProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, college.hashCode);
-    hash = _SystemHash.combine(hash, mealTime.hashCode);
-    hash = _SystemHash.combine(hash, cat.hashCode);
-    hash = _SystemHash.combine(hash, day.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin MealAlbumRef on AsyncNotifierProviderRef<List<FoodCategory>> {
-  /// The parameter `college` of this provider.
-  String get college;
+String _$mealAlbumHash() => r'f56d1a3cb7b940ec53907a289cbcd2ba0b2c0ed8';
 
-  /// The parameter `mealTime` of this provider.
-  String get mealTime;
+final class MealAlbumFamily extends $Family
+    with
+        $ClassFamilyOverride<
+            MealAlbum,
+            AsyncValue<List<FoodCategory>>,
+            List<FoodCategory>,
+            FutureOr<List<FoodCategory>>,
+            (
+              String,
+              String, {
+              String cat,
+              String day,
+            })> {
+  const MealAlbumFamily._()
+      : super(
+          retry: null,
+          name: r'mealAlbumProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: false,
+        );
 
-  /// The parameter `cat` of this provider.
-  String get cat;
+  MealAlbumProvider call(
+    String college,
+    String mealTime, {
+    String cat = '',
+    String day = 'Today',
+  }) =>
+      MealAlbumProvider._(argument: (
+        college,
+        mealTime,
+        cat: cat,
+        day: day,
+      ), from: this);
 
-  /// The parameter `day` of this provider.
-  String get day;
+  @override
+  String toString() => r'mealAlbumProvider';
 }
 
-class _MealAlbumProviderElement
-    extends AsyncNotifierProviderElement<MealAlbum, List<FoodCategory>>
-    with MealAlbumRef {
-  _MealAlbumProviderElement(super.provider);
+abstract class _$MealAlbum extends $AsyncNotifier<List<FoodCategory>> {
+  late final _$args = ref.$arg as (
+    String,
+    String, {
+    String cat,
+    String day,
+  });
+  String get college => _$args.$1;
+  String get mealTime => _$args.$2;
+  String get cat => _$args.cat;
+  String get day => _$args.day;
 
+  FutureOr<List<FoodCategory>> build(
+    String college,
+    String mealTime, {
+    String cat = '',
+    String day = 'Today',
+  });
+  @$mustCallSuper
   @override
-  String get college => (origin as MealAlbumProvider).college;
-  @override
-  String get mealTime => (origin as MealAlbumProvider).mealTime;
-  @override
-  String get cat => (origin as MealAlbumProvider).cat;
-  @override
-  String get day => (origin as MealAlbumProvider).day;
+  void runBuild() {
+    final created = build(
+      _$args.$1,
+      _$args.$2,
+      cat: _$args.cat,
+      day: _$args.day,
+    );
+    final ref =
+        this.ref as $Ref<AsyncValue<List<FoodCategory>>, List<FoodCategory>>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<List<FoodCategory>>, List<FoodCategory>>,
+        AsyncValue<List<FoodCategory>>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -10,8 +10,8 @@ class GetMobilePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authNotifierProvider);
-    print('auth: ${auth}');
+    final auth = ref.watch(authProvider);
+    print('auth: $auth');
     return auth.sessionId == null 
         ? const GetLoginPage() 
         : const BarcodePage();

@@ -157,7 +157,7 @@ class _SummaryWidgetState extends State<SummaryWidget> {
               onPressed: _toggleView,
               icon: _isDetailedView
                   ? const Icon(LucideIcons.list)
-                  : const Icon(LucideIcons.align_left),
+                  : const Icon(LucideIcons.text_align_start),
               color: Theme.of(context).colorScheme.onSurface,
             ),
           ],

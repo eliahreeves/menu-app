@@ -6,19 +6,47 @@ part of '../../providers/update_time_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(UpdateTime)
+const updateTimeProvider = UpdateTimeProvider._();
+
+final class UpdateTimeProvider
+    extends $AsyncNotifierProvider<UpdateTime, String> {
+  const UpdateTimeProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'updateTimeProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateTimeHash();
+
+  @$internal
+  @override
+  UpdateTime create() => UpdateTime();
+}
+
 String _$updateTimeHash() => r'f3378d9f8a2d25760752ab28d965970127843577';
 
-/// See also [UpdateTime].
-@ProviderFor(UpdateTime)
-final updateTimeProvider = AsyncNotifierProvider<UpdateTime, String>.internal(
-  UpdateTime.new,
-  name: r'updateTimeProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$updateTimeHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$UpdateTime = AsyncNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$UpdateTime extends $AsyncNotifier<String> {
+  FutureOr<String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<String>, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<String>, String>,
+        AsyncValue<String>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}

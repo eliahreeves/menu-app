@@ -33,7 +33,7 @@ class _BarCodePageState extends ConsumerState<BarcodePage> {
   @override
   void initState() {
     super.initState();
-    isLocked = ref.read(authNotifierProvider.notifier).isPINEntryRequired();
+    isLocked = ref.read(authProvider.notifier).isPINEntryRequired();
     if (!isLocked) {
       ScreenBrightness.instance.setApplicationScreenBrightness(1);
     } else {
@@ -44,14 +44,14 @@ class _BarCodePageState extends ConsumerState<BarcodePage> {
   void _checkBioAuth() async {
     final prefs = PrefsService.instance;
     if (prefs.getBool('get_bio_auth_enabled') ?? constants.enableBiometric) {
-    try{
-      final bool didAuthenticate = await LocalAuthentication().authenticate(
+      try {
+        final bool didAuthenticate = await LocalAuthentication().authenticate(
           localizedReason: 'Please authenticate to show code',
-          options: const AuthenticationOptions());
-      setState(() {
-        isLocked = !didAuthenticate;
-      });
-      } catch (e){
+        );
+        setState(() {
+          isLocked = !didAuthenticate;
+        });
+      } catch (e) {
         debugPrint("Failed Bio Auth");
         debugPrintStack();
       }
@@ -111,7 +111,7 @@ class _BarCodePageState extends ConsumerState<BarcodePage> {
               hoverColor: Colors.transparent,
               splashFactory: NoSplash.splashFactory,
               onTap: () async {
-                await ref.read(authNotifierProvider.notifier).logout();
+                await ref.read(authProvider.notifier).logout();
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
@@ -194,9 +194,7 @@ class _BarCodePageState extends ConsumerState<BarcodePage> {
                 child: KeyPad(
                   controller: controller,
                   onFull: (pin) {
-                    if (ref
-                        .read(authNotifierProvider.notifier)
-                        .validatePin(pin)) {
+                    if (ref.read(authProvider.notifier).validatePin(pin)) {
                       setState(() {
                         isLocked = false;
                         ScreenBrightness.instance
@@ -267,9 +265,7 @@ class _BarCodePageState extends ConsumerState<BarcodePage> {
                   _InfoCard(
                     label: 'Balance',
                     value: balance.when(
-                      data: (data) => data != null
-                          ? '\$${data.toStringAsFixed(2)}'
-                          : 'An Error Occurred',
+                      data: (data) => '\$${data.toStringAsFixed(2)}',
                       loading: () => 'Loading ...',
                       error: (error, _) => 'An Error Occurred',
                     ),
@@ -292,8 +288,8 @@ class BarCode extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // The stream is listened to and converted to an AsyncValue.
-    final sessionId = ref.watch(authNotifierProvider).sessionId;
-    final auth = ref.read(authNotifierProvider.notifier);
+    final sessionId = ref.watch(authProvider).sessionId;
+    final auth = ref.read(authProvider.notifier);
     final value = ref.watch(barCodeStream(sessionId));
 
     // We can use the AsyncValue to handle loading/error states and show the data.

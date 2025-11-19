@@ -40,7 +40,6 @@ class CustomTabBar extends StatelessWidget {
                   index: 3,
                   selectedIndex: selectedIndex,
                   selectIndex: selectIndex),
-              //_Button(text: AppLocalizations.of(context)!.oldTab, index: 3),
             ],
           ),
         ));

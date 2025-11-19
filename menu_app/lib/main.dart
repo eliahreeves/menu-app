@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gma_mediation_applovin/gma_mediation_applovin.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:menu_app/ads/ad_helper.dart';
 import 'package:menu_app/providers/theme_provider.dart';
@@ -18,8 +17,6 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  GmaMediationApplovin().setDoNotSell(true);
-  
   await Future.wait([
     PrefsService.init(),
   
@@ -47,8 +44,8 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final adState = ref.watch(adStateNotifierProvider);
-    final theme = ref.watch(themeNotifierProvider);
+    final adState = ref.watch(adStateProvider);
+    final theme = ref.watch(themeProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(

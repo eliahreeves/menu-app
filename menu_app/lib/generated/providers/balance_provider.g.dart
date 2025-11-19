@@ -6,20 +6,47 @@ part of '../../providers/balance_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(GetBalance)
+const getBalanceProvider = GetBalanceProvider._();
+
+final class GetBalanceProvider
+    extends $AsyncNotifierProvider<GetBalance, double> {
+  const GetBalanceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'getBalanceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$getBalanceHash();
+
+  @$internal
+  @override
+  GetBalance create() => GetBalance();
+}
+
 String _$getBalanceHash() => r'd54dee938f7ab51cf6cf8caa908284a286e42a0f';
 
-/// See also [GetBalance].
-@ProviderFor(GetBalance)
-final getBalanceProvider =
-    AutoDisposeAsyncNotifierProvider<GetBalance, double>.internal(
-  GetBalance.new,
-  name: r'getBalanceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$getBalanceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$GetBalance = AutoDisposeAsyncNotifier<double>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$GetBalance extends $AsyncNotifier<double> {
+  FutureOr<double> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<double>, double>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<double>, double>,
+        AsyncValue<double>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}

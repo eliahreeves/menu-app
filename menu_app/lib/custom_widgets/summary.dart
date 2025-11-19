@@ -6,7 +6,6 @@ import 'package:menu_app/providers/college_list_provider.dart';
 import 'package:menu_app/providers/summary_list_provider.dart';
 import 'package:menu_app/providers/waitz_crowd_status.dart';
 import 'package:menu_app/utilities/constants.dart' as constants;
-import 'package:menu_app/views/error_widget.dart';
 
 class SummaryList extends ConsumerWidget {
   final String mealTime;

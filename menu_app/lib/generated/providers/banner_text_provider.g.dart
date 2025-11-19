@@ -6,19 +6,47 @@ part of '../../providers/banner_text_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(BannerText)
+const bannerTextProvider = BannerTextProvider._();
+
+final class BannerTextProvider
+    extends $AsyncNotifierProvider<BannerText, String> {
+  const BannerTextProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'bannerTextProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$bannerTextHash();
+
+  @$internal
+  @override
+  BannerText create() => BannerText();
+}
+
 String _$bannerTextHash() => r'22ac4d6177981a38beeb34a67a23fb5408e74fde';
 
-/// See also [BannerText].
-@ProviderFor(BannerText)
-final bannerTextProvider = AsyncNotifierProvider<BannerText, String>.internal(
-  BannerText.new,
-  name: r'bannerTextProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$bannerTextHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$BannerText = AsyncNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$BannerText extends $AsyncNotifier<String> {
+  FutureOr<String> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<String>, String>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<String>, String>,
+        AsyncValue<String>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}

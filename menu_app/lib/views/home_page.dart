@@ -13,7 +13,6 @@ import 'package:menu_app/providers/meal_album_provider.dart';
 import 'package:menu_app/providers/summary_list_provider.dart';
 import 'package:menu_app/providers/update_time_provider.dart';
 import 'package:menu_app/providers/waitz_crowd_status.dart';
-import 'package:menu_app/views/error_widget.dart';
 // import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:menu_app/views/get_mobile_page.dart';
 // import 'package:provider/provider.dart' as prov;
@@ -126,7 +125,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ? FloatingActionButton(
               onPressed: () async {
                 ref
-                    .read(adStateNotifierProvider.notifier)
+                    .read(adStateProvider.notifier)
                     .updateAdState(isEnabled: false);
                 await Navigator.push(
                   context,
@@ -134,7 +133,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     builder: (BuildContext context) => const GetMobilePage(),
                   ),
                 ).then((_) => ref
-                    .read(adStateNotifierProvider.notifier)
+                    .read(adStateProvider.notifier)
                     .updateAdState(isEnabled: true));
                 // showOverlay(context); // Show the overlay first
                 // await Future.delayed(const Duration(seconds: 2));

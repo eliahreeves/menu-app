@@ -186,6 +186,9 @@ class NutritionLabel extends StatelessWidget {
                               isAntiAlias: true,
                               fit: BoxFit.contain,
                               scale: 1.25,
+                              errorBuilder: (_, __, ___) {
+                                return SizedBox.shrink();
+                              },
                             ),
                           ),
                         )

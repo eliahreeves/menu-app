@@ -9,7 +9,7 @@ class GetLoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authNotifier = ref.read(authNotifierProvider.notifier);
+    final authNotifier = ref.read(authProvider.notifier);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

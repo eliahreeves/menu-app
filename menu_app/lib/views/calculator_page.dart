@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:menu_app/providers/balance_provider.dart';
 import 'package:menu_app/providers/get_auth_notifier.dart';
 import 'package:menu_app/views/calculator_widgets.dart';
-import 'package:menu_app/views/error_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menu_app/utilities/prefs_service.dart';
 import 'package:menu_app/views/nav_drawer.dart';
@@ -217,10 +216,10 @@ class _CalculatorState extends ConsumerState<Calculator>
                                 await attempt();
                               } catch (e) {
                                 // Handle the exception, e.g., show an error message
-                                if (ref.read(authNotifierProvider).sessionId !=
+                                if (ref.read(authProvider).sessionId !=
                                     null) {
                                   await ref
-                                      .read(authNotifierProvider.notifier)
+                                      .read(authProvider.notifier)
                                       .authenticateWithPin();
                                   try {
                                     await attempt();
@@ -232,7 +231,7 @@ class _CalculatorState extends ConsumerState<Calculator>
                                 } else {
                                   if (context.mounted) {
                                     await ref
-                                        .read(authNotifierProvider.notifier)
+                                        .read(authProvider.notifier)
                                         .login(context);
                                     try {
                                       await attempt();

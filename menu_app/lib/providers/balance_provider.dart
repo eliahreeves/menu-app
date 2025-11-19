@@ -11,7 +11,7 @@ part '../generated/providers/balance_provider.g.dart';
 class GetBalance extends _$GetBalance {
   @override
   Future<double> build() async {
-    final sessionId = ref.watch(authNotifierProvider).sessionId;
+    final sessionId = ref.watch(authProvider).sessionId;
     if (sessionId == null) {
       throw Exception("No session ID found");
     }

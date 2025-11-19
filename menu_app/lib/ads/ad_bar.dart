@@ -53,7 +53,7 @@ class _AdBarState extends ConsumerState<AdBar> {
   /// Loads a banner ad.
   @override
   Widget build(BuildContext context) {
-    final adState = ref.watch(adStateNotifierProvider);
+    final adState = ref.watch(adStateProvider);
     return (adState.bannerAd != null && adState.isLoaded)
         ? SizedBox(
             width: adState.bannerAd!.size.width.toDouble(),
@@ -92,7 +92,7 @@ class _AdBarState extends ConsumerState<AdBar> {
         // Called when an ad is successfully received.
         onAdLoaded: (ad) {
           ref
-              .read(adStateNotifierProvider.notifier)
+              .read(adStateProvider.notifier)
               .updateAdState(bannerAd: ad as BannerAd, isLoaded: true);
 
           // setState(() {

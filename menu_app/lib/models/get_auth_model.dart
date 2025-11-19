@@ -1,12 +1,12 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:flutter/foundation.dart';
+class GetAuth {
+  final String? sessionId;
+  final String? deviceId;
+  const GetAuth({this.sessionId, this.deviceId});
 
-part '../generated/models/get_auth_model.freezed.dart';
-
-@freezed
-class GetAuth with _$GetAuth {
-  factory GetAuth({
-    required String? sessionId,
-    required String? deviceId,
-  }) = _GetAuth;
+  GetAuth copyWith({String? sessionId, String? deviceId}) {
+    return GetAuth(
+      sessionId: sessionId ?? this.sessionId,
+      deviceId: deviceId ?? this.deviceId,
+    );
+  }
 }

@@ -13,7 +13,7 @@ class GetUser extends _$GetUser {
   }
 
   Future<void> _fetchName() async {
-    final sessionId = ref.watch(authNotifierProvider).sessionId;
+    final sessionId = ref.watch(authProvider).sessionId;
 
     if (sessionId == null) {
       return;
