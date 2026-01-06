@@ -14,17 +14,16 @@ import (
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
 	"github.com/gocolly/colly/v2"
-	"github.com/joho/godotenv"
 )
 
 var url = "https://nutrition.sa.ucsc.edu/"
 
 var diningHallNames = map[string]string{
-	"John R. Lewis & College Nine Dining Hall":     "Nine",
-	"Cowell & Stevenson Dining Hall":               "Cowell",
-	"Crown & Merrill Dining Hall and Banana Joe's": "Merrill",
-	"Porter & Kresge Dining Hall":                  "Porter",
-	"Rachel Carson & Oakes Dining Hall":            "Oakes",
+	"John R. Lewis & College Nine Dining Hall": "Nine",
+	"Cowell & Stevenson Dining Hall":           "Cowell",
+	"Crown & Merrill Dining Hall":              "Merrill",
+	"Porter & Kresge Dining Hall":              "Porter",
+	"Rachel Carson & Oakes Dining Hall":        "Oakes",
 }
 
 var excludeCategories = []string{
@@ -81,10 +80,6 @@ var menu = make(map[string]interface{})
 
 // main function
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Printf("Error loading .env file")
-	}
 	config := &firebase.Config{
 		DatabaseURL: "https://ucsc-menu-app-default-rtdb.firebaseio.com/",
 	}
@@ -132,7 +127,7 @@ func main() {
 	// 	fmt.Printf("error creating file: %v", err)
 	// }
 	// defer file.Close()
-
+	//
 	// // Write the menu to the file in a readable format
 	// menuJson, err := json.MarshalIndent(menu, "", "  ")
 	// if err != nil {

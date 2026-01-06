@@ -21,6 +21,7 @@
           mkShell {
             buildInputs = [
               go
+              google-cloud-sdk
             ];
           };
       }
