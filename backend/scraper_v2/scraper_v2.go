@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"path"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -76,7 +77,7 @@ type PubSubMessage struct {
 }
 
 // global menu map
-var menu = make(map[string]interface{})
+var menu = make(map[string]any)
 
 // main function
 func main() {
@@ -94,7 +95,7 @@ func main() {
 		return
 	}
 
-	menu = make(map[string]interface{}) // clear menu map
+	menu = make(map[string]any) // clear menu map
 
 	start := time.Now()
 
@@ -163,7 +164,7 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 		return fmt.Errorf("error initializing database client: %v", err)
 	}
 
-	menu = make(map[string]interface{}) // clear menu map
+	menu = make(map[string]any) // clear menu map
 
 	maxRetries := 2
 	retryDelay := 1 * time.Second
@@ -211,6 +212,7 @@ func ScraperRun(ctx context.Context, m PubSubMessage) error {
 // scrape functions
 func scrape() error {
 	var mu sync.Mutex
+	var scrapeErrors []error
 	a := colly.NewCollector(
 		colly.Async(true),
 		colly.MaxDepth(4),
@@ -218,7 +220,9 @@ func scrape() error {
 
 	// Set up error handling
 	a.OnError(func(r *colly.Response, err error) {
-		fmt.Printf("Request URL: %s failed with response: %v\nError: %v\n", r.Request.URL, r, err)
+		mu.Lock()
+		scrapeErrors = append(scrapeErrors, fmt.Errorf("request URL: %s failed with response: %v, Error: %v", r.Request.URL, r, err))
+		mu.Unlock()
 	})
 
 	// Configure transport for TLS
@@ -230,70 +234,72 @@ func scrape() error {
 	a.OnHTML("a[href]", func(e *colly.HTMLElement) {
 		dhLink := url + e.Attr("href")
 		if strings.Contains(dhLink, "Dining+Hall") {
-			diningHall := diningHallNames[e.Text]
-			err := processHall(a.Clone(), diningHall, dhLink, &mu)
-			if err != nil {
-				fmt.Printf("Error processing dining hall %s: %v\n", e.Text, err)
+			diningHall, ok := diningHallNames[e.Text]
+			if !ok {
+				mu.Lock()
+				scrapeErrors = append(scrapeErrors, fmt.Errorf("found unknown dining hall link with text: '%s'", e.Text))
+				mu.Unlock()
+				return
 			}
+			processHall(a.Clone(), diningHall, dhLink, &mu, &scrapeErrors)
 		}
 	})
 
 	// Start the scraping process
-	err := a.Visit(url)
-	if err != nil {
+	if err := a.Visit(url); err != nil {
 		return err
 	}
-
-	// Wait for all asynchronous operations to complete
 	a.Wait()
-
+	if len(scrapeErrors) > 0 {
+		return scrapeErrors[0]
+	}
 	return nil
 }
 
-func processHall(b *colly.Collector, diningHall string, dhLink string, mu *sync.Mutex) error {
-	// Handler for date options
+func processHall(b *colly.Collector, diningHall string, dhLink string, mu *sync.Mutex, scrapeErrors *[]error) {
 	b.OnHTML("option", func(f *colly.HTMLElement) {
-		day := getDayLabel(f.Text)
-		if day != "" {
-			dateLink := url + f.Attr("value")
-			err := processDate(b.Clone(), diningHall, day, dateLink, mu)
-			if err != nil {
-				fmt.Printf("Error processing date %s: %v\n", f.Text, err)
-			}
+		day, err := getDayLabel(f.Text)
+		if err != nil {
+			return
 		}
+		dateLink := url + f.Attr("value")
+		processDate(b.Clone(), diningHall, day, dateLink, mu, scrapeErrors)
 	})
 
-	err := b.Visit(dhLink)
-	if err != nil {
-		return err
+	if err := b.Visit(dhLink); err != nil {
+		mu.Lock()
+		*scrapeErrors = append(*scrapeErrors, err)
+		mu.Unlock()
 	}
-
 	b.Wait()
-
-	return nil
 }
 
-func processDate(c *colly.Collector, diningHall string, day, dateLink string, mu *sync.Mutex) error {
-	// Handler for meal links
+func processDate(c *colly.Collector, diningHall string, day, dateLink string, mu *sync.Mutex, scrapeErrors *[]error) {
 	c.OnHTML("a[href]", func(g *colly.HTMLElement) {
 		nutritionLink := url + g.Attr("href")
 		if strings.Contains(nutritionLink, "mealName=") {
-			mealTime := getMealTime(g.Attr("href"))
-			err := processMeal(c.Clone(), nutritionLink, day, diningHall, mealTime, mu)
+			mealTime, err := getMealTime(g.Attr("href"))
 			if err != nil {
-				fmt.Printf("Error processing meal %s at %s: %v\n", mealTime, diningHall, err)
+				mu.Lock()
+				*scrapeErrors = append(*scrapeErrors, err)
+				mu.Unlock()
+				return
+			}
+			err = processMeal(c.Clone(), nutritionLink, day, diningHall, mealTime, mu)
+			if err != nil {
+				mu.Lock()
+				*scrapeErrors = append(*scrapeErrors, fmt.Errorf("error processing meal %s at %s: %v", mealTime, diningHall, err))
+				mu.Unlock()
 			}
 		}
 	})
 
-	err := c.Visit(dateLink)
-	if err != nil {
-		return err
+	if err := c.Visit(dateLink); err != nil {
+		mu.Lock()
+		*scrapeErrors = append(*scrapeErrors, err)
+		mu.Unlock()
 	}
-
 	c.Wait()
-
-	return nil
 }
 
 func processMeal(d *colly.Collector, nutritionLink, day, diningHall, mealTime string, mu *sync.Mutex) error {
@@ -366,7 +372,7 @@ func processFoodItem(e *colly.Collector, foodName, foodLink, day, diningHall, me
 }
 
 // helper functions for scrape
-func getDayLabel(dateText string) string {
+func getDayLabel(dateText string) (string, error) {
 	location, _ := time.LoadLocation("America/Los_Angeles")
 	today := time.Now().In(location).Format("Monday, January 2")
 	tomorrow := time.Now().In(location).AddDate(0, 0, 1).Format("Monday, January 2")
@@ -374,34 +380,34 @@ func getDayLabel(dateText string) string {
 
 	switch {
 	case strings.Contains(dateText, today):
-		return "Today"
+		return "Today", nil
 	case strings.Contains(dateText, tomorrow):
-		return "Tomorrow"
+		return "Tomorrow", nil
 	case strings.Contains(dateText, dayAfter):
-		return "Day after tomorrow"
+		return "Day after tomorrow", nil
 	default:
-		return ""
+		return "", fmt.Errorf("could not determine day for date text: %q", dateText)
 	}
 }
 
-func getMealTime(href string) string {
+func getMealTime(href string) (string, error) {
 	switch {
 	case strings.Contains(href, "Breakfast"):
-		return "Breakfast"
+		return "Breakfast", nil
 	case strings.Contains(href, "Lunch"):
-		return "Lunch"
+		return "Lunch", nil
 	case strings.Contains(href, "Dinner"):
-		return "Dinner"
+		return "Dinner", nil
 	case strings.Contains(href, "Late+Night"):
-		return "Late Night"
+		return "Late Night", nil
 	default:
-		return ""
+		return "", fmt.Errorf("could not determine meal time from href: %q", href)
 	}
 }
 
 func processCategory(categoryText string) string {
-	category := strings.Replace(categoryText, "-- ", "", -1)
-	return strings.Replace(category, " --", "", -1)
+	category := strings.ReplaceAll(categoryText, "-- ", "")
+	return strings.ReplaceAll(category, " --", "")
 }
 
 func isExcludedCategory(category string) bool {
@@ -514,7 +520,7 @@ func reorderCategories() error {
 			// Iterate over each mealtime
 			for mealTime, categories := range diningHallData {
 				// Apply reordering logic to the categories
-				reorderedCategories := reorder(categories, mealTime, diningHall)
+				reorderedCategories := reorder(categories, mealTime)
 				// Update the global menu map with reordered categories
 				menu[day].(map[string]map[string][]Category)[diningHall][mealTime] = reorderedCategories
 			}
@@ -523,11 +529,10 @@ func reorderCategories() error {
 	return nil
 }
 
-func reorder(categories []Category, mealTime, diningHall string) []Category {
+func reorder(categories []Category, mealTime string) []Category {
 	priorityOrder := map[string][]string{
-		"Breakfast":   {"Breakfast"},
-		"Banana Joes": {"Banana Joes"},
-		"Default":     {"Open Bars", "Hot Bars", "Entrees", "Unit Specialties", "Grill"},
+		"Breakfast": {"Breakfast"},
+		"Default":   {"Open Bars", "Hot Bars", "Entrees", "Unit Specialties", "Grill"},
 	}
 
 	var orderedCategories []Category
@@ -535,8 +540,6 @@ func reorder(categories []Category, mealTime, diningHall string) []Category {
 
 	if mealTime == "Breakfast" {
 		priority = priorityOrder["Breakfast"]
-	} else if mealTime == "Late Night" && diningHall == "Merrill" {
-		priority = priorityOrder["Banana Joes"]
 	}
 
 	// Add categories based on priority
@@ -550,13 +553,7 @@ func reorder(categories []Category, mealTime, diningHall string) []Category {
 
 	// Add remaining categories
 	for _, c := range categories {
-		found := false
-		for _, p := range priority {
-			if c.Name == p {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(priority, c.Name)
 		if !found {
 			orderedCategories = append(orderedCategories, c)
 		}
@@ -598,11 +595,11 @@ func makeSummary() error {
 }
 
 // Database function
-func updateDatabase(client *db.Client, hall_menus map[string]interface{}) error {
+func updateDatabase(client *db.Client, hall_menus map[string]any) error {
 	ref := client.NewRef("/menuv2/")
 
 	// Save the current state of the database
-	var currentData map[string]interface{}
+	var currentData map[string]any
 	if err := ref.Get(context.Background(), &currentData); err != nil {
 		return fmt.Errorf("failed to get current data: %w", err)
 	}
