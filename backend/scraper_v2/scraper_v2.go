@@ -19,12 +19,22 @@ import (
 
 var url = "https://nutrition.sa.ucsc.edu/"
 
-var diningHallNames = map[string]string{
-	"John R. Lewis & College Nine Dining Hall": "Nine",
-	"Cowell & Stevenson Dining Hall":           "Cowell",
-	"Crown & Merrill Dining Hall":              "Merrill",
-	"Porter & Kresge Dining Hall":              "Porter",
-	"Rachel Carson & Oakes Dining Hall":        "Oakes",
+func getDiningHallName(text string) (string, error) {
+	text = strings.ToLower(text)
+	switch {
+	case strings.Contains(text, "nine"):
+		return "Nine", nil
+	case strings.Contains(text, "cowell"):
+		return "Cowell", nil
+	case strings.Contains(text, "merrill"):
+		return "Merrill", nil
+	case strings.Contains(text, "porter"):
+		return "Porter", nil
+	case strings.Contains(text, "oakes"):
+		return "Oakes", nil
+	default:
+		return "", fmt.Errorf("could not identify dining hall from text: %q", text)
+	}
 }
 
 var excludeCategories = []string{
@@ -234,10 +244,10 @@ func scrape() error {
 	a.OnHTML("a[href]", func(e *colly.HTMLElement) {
 		dhLink := url + e.Attr("href")
 		if strings.Contains(dhLink, "Dining+Hall") {
-			diningHall, ok := diningHallNames[e.Text]
-			if !ok {
+			diningHall, err := getDiningHallName(e.Text)
+			if err != nil {
 				mu.Lock()
-				scrapeErrors = append(scrapeErrors, fmt.Errorf("found unknown dining hall link with text: '%s'", e.Text))
+				scrapeErrors = append(scrapeErrors, err)
 				mu.Unlock()
 				return
 			}
